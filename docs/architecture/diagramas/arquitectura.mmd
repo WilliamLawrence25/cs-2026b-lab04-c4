@@ -1,0 +1,41 @@
+flowchart TB
+    EST["Estudiante"]
+    BIB["Bibliotecario"]
+
+    subgraph APP ["BiblioUNSA (Monolito en capas)"]
+        subgraph PRES ["Capa de Presentación"]
+            UI["Interfaz Web (Catálogo y Gestión)"]
+        end
+        
+        subgraph BLL ["Capa de Lógica de Negocio"]
+            CAT["Gestión de Catálogo"]
+            RES["Gestión de Reservas"]
+            PRE["Control de Préstamos y Multas"]
+        end
+        
+        subgraph DAL ["Capa de Acceso a Datos"]
+            REP["Repositorios / ORM"]
+        end
+    end
+
+    DB[("Base de Datos<br/>(PostgreSQL)")]
+    ACA["API Sistema Académico<br/>(Servicio Externo)"]
+    SSO["Google Workspace<br/>(SSO UNSA)"]
+
+    EST & BIB --> UI
+    UI --> CAT & RES & PRE
+    
+    %% Integraciones externas desde la lógica
+    RES & PRE -.->|Validación de matrícula| ACA
+    UI -.->|Autenticación| SSO
+
+    CAT & RES & PRE --> REP
+    REP --> DB
+
+    classDef mod fill:#E8F5E9,stroke:#2E7D32,color:#000
+    classDef ext fill:#F2F2F2,stroke:#7F7F7F,color:#000,stroke-dasharray: 4 3
+    classDef usr fill:#FDEDEC,stroke:#C8310E,color:#000
+    
+    class UI,CAT,RES,PRE,REP mod
+    class ACA,SSO ext
+    class EST,BIB usr

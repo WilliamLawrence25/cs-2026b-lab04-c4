@@ -1,0 +1,46 @@
+@startuml
+skinparam dpi 220
+skinparam componentStyle rectangle
+skinparam defaultFontName Arial
+skinparam backgroundColor white
+
+title Alternativa B (descartada): BiblioUNSA como Monolito Modular
+
+actor "Estudiante / Bibliotecario" as U
+
+package "Monolito Modular (BiblioUNSA)" {
+    [Módulo de Catálogo] as Cat
+    [Módulo de Reservas] as Res
+    [Módulo de Préstamos] as Pre
+    [Módulo de Autenticación] as Aut
+}
+
+database "PostgreSQL\n(Esquemas separados)" as DB
+
+cloud "Google Workspace\n(SSO)" as SSO
+cloud "API Sistema Académico\n(Validación)" as ACA
+
+U --> Aut
+U --> Cat
+U --> Res
+U --> Pre
+
+Aut --> SSO
+Res -.-> ACA : Validación
+Pre -.-> ACA : Multas/Estado
+
+Cat --> DB
+Res --> DB
+Pre --> DB
+
+note bottom of DB
+  Descartado (Puntaje: 4.00):
+  Aunque ofrece excelente organización interna,
+  definir interfaces estrictas entre módulos y
+  separar esquemas en la base de datos exige
+  un tiempo de desarrollo inicial mayor. Esto
+  representa un riesgo al contar con un solo 
+  desarrollador (R-02) frente a un plazo de 1 mes (R-01).
+end note
+
+@enduml

@@ -1,0 +1,71 @@
+@startuml clases-bibliounsa
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam classBackgroundColor #EEF2F8
+skinparam classBorderColor #1A3A5C
+
+title BiblioUNSA - Diseño del Módulo de Préstamos
+
+class Estudiante {
+  - cui: String
+  - correo: String
+  + consultarEstado(): String
+}
+
+class Libro {
+  - isbn: String
+  - titulo: String
+  - copiasDisponibles: int
+  + reservarCopia(): void
+  + liberarCopia(): void
+}
+
+class Prestamo {
+  - id: UUID
+  - fechaInicio: DateTime
+  - fechaLimite: DateTime
+  - estado: EstadoPrestamo
+  + confirmarReserva(cui: String, isbn: String): void
+  + registrarEntrega(): void
+  + registrarDevolucion(): void
+  + aplicarMulta(monto: Decimal): void
+}
+
+class Multa {
+  - id: UUID
+  - monto: Decimal
+  - pagada: bool
+  + calcularDiasRetraso(): int
+  + pagar(): void
+}
+
+enum EstadoPrestamo {
+  RESERVADO
+  PRESTADO
+  VENCIDO
+  DEVUELTO
+  CON_MULTA
+}
+
+interface ValidadorMatricula <<puerto>> {
+  + estaMatriculado(cui: String): bool
+}
+
+class ApiUnsaAdapter <<adaptador>> {
+  + estaMatriculado(cui: String): bool
+}
+
+class ServicioPrestamos <<servicio>> {
+  + crearReserva(cui: String, isbn: String): Prestamo
+}
+
+Estudiante "1" -- "0..*" Prestamo : realiza >
+Libro "1" -- "0..*" Prestamo : incluye >
+Prestamo "1" *-- "0..1" Multa : genera >
+Prestamo --> EstadoPrestamo
+ValidadorMatricula <|.. ApiUnsaAdapter : realiza
+ServicioPrestamos ..> Prestamo : gestiona
+ServicioPrestamos ..> ValidadorMatricula : usa
+
+@enduml

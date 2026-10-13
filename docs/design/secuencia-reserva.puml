@@ -1,0 +1,44 @@
+@startuml secuencia-reserva
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam sequenceMessageAlign center
+autonumber
+
+actor Estudiante
+participant "Interfaz Web" as UI
+participant "PrestamoController" as C
+participant "ServicioPrestamos" as S
+participant "ValidadorMatricula\n(ApiUnsaAdapter)" as V
+participant "Libro" as L
+participant "Prestamo" as P
+participant "NotificadorCorreo\n<<puerto>>" as N
+
+Estudiante -> UI: Reservar libro (cui, isbn)
+UI -> C: POST /api/reservas
+C -> S: crearReserva(cui, isbn)
+
+S -> V: estaMatriculado(cui)
+V --> S: true/false
+
+alt matrícula vigente y stock disponible
+    S -> L: reservarCopia()
+    L --> S: OK
+    
+    S -> P **: create()
+    S -> P: confirmarReserva(cui, isbn)
+    P --> S: estado = RESERVADO
+    
+    opt si el estudiante tiene correo registrado
+        S ->> N: notificarReserva(cui, isbn)
+        note right of N: asíncrono\n(no bloquea la respuesta)
+    end
+    
+    S --> C: Prestamo (RESERVADO)
+    C --> UI: 200 OK (Reserva exitosa)
+else matrícula no vigente o sin stock
+    S --> C: Exception("Matrícula no vigente")
+    C --> UI: 403 Forbidden
+end
+
+UI --> Estudiante: Muestra resultado de la operación
+@enduml

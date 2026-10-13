@@ -60,3 +60,30 @@ flowchart TB
 
 ## Reflexión sobre el uso de la IA
 El uso de asistentes de IA fue fundamental para agilizar la generación de diagramas como código y estructurar rápidamente la documentación de las decisiones. Sin embargo, la herramienta demostró un sesgo evidente hacia arquitecturas complejas, recomendando inicialmente un enfoque de microservicios. Como único desarrollador con un plazo de entrega de un mes y presupuesto nulo, aplicar esa recomendación habría llevado al fracaso operativo del proyecto. Esto subraya que la IA es excelente proponiendo y redactando, pero el juicio arquitectónico y la validación estricta contra las restricciones reales siguen siendo responsabilidad exclusiva del ingeniero.
+
+## Diseño UML (Lab 05)
+
+Como parte de la evolución de la arquitectura, se ha realizado el diseño detallado del módulo de Préstamos aplicando metodologías de **Diagram as Code** e **Ingeniería Inversa** con Python.
+
+### Máquina de Estados: Ciclo de vida del Préstamo
+```mermaid
+stateDiagram-v2
+    [*] --> RESERVADO: confirmarReserva() [matrícula vigente]
+    
+    RESERVADO --> PRESTADO: registrarEntrega()
+    RESERVADO --> [*]: cancelarReserva() [no recogido en 24h]
+    
+    PRESTADO --> DEVUELTO: registrarDevolucion() [antes de fecha límite]
+    PRESTADO --> VENCIDO: verificarVencimiento() [fecha límite superada]
+    
+    VENCIDO --> CON_MULTA: aplicarMulta()
+    
+    CON_MULTA --> DEVUELTO: registrarDevolucion() [multa pagada]
+    
+    DEVUELTO --> [*]
+```
+
+### Enlaces a Entregables del Diseño
+- 🏗️ **Estructural:** [Diagrama de Clases](docs/design/img/clases.png) y [Diagrama de Paquetes](docs/design/img/paquetes.png)
+- ⚙️ **Comportamiento:** [Diagrama de Secuencia (Reserva)](docs/design/img/secuencia-reserva.png) y [Diagrama de Actividades (Devolución y Multa)](docs/design/img/actividades-devolucion.png)
+- 🔄 **Auditoría e IA:** [Análisis Round-Trip](docs/design/round-trip.md), [Reporte de Consistencia C1-C5](docs/design/consistencia.md) y [Bitácora de IA](docs/design/bitacora-ia.md).

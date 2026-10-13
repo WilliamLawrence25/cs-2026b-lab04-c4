@@ -1,0 +1,51 @@
+@startuml paquetes
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam packageStyle rectangle
+
+title BiblioUNSA - Diagrama de Paquetes (Monolito en Capas)
+
+package "bibliounsa" {
+    package "presentacion" as PRE
+    
+    package "logica_negocio" {
+        package "prestamos" as PRES
+        package "reservas" as RES
+        package "catalogo" as CAT
+    }
+    
+    package "acceso_datos" as DAT
+    package "compartido" as COM
+}
+
+package "sistemas_externos" {
+    package "api_academica" as API
+}
+
+PRE ..> PRES : usa ServicioPrestamos
+PRE ..> RES : usa ServicioReservas
+PRE ..> CAT : usa ServicioCatalogo
+
+PRES ..> CAT : usa Libro
+RES ..> CAT : usa Libro
+
+PRES ..> DAT : usa RepositorioPrestamos
+RES ..> DAT : usa RepositorioReservas
+CAT ..> DAT : usa RepositorioCatalogo
+
+PRES ..> API : usa ValidadorMatricula\n(puerto)
+RES ..> API : usa ValidadorMatricula\n(puerto)
+
+PRES ..> COM : usa utilidades
+RES ..> COM : usa utilidades
+CAT ..> COM : usa utilidades
+DAT ..> COM : usa utilidades
+
+note bottom of bibliounsa
+  Regla (ADR-001 y C4): Arquitectura en capas estrictas.
+  La presentación depende de la lógica, y la lógica de los datos.
+  No existen dependencias cíclicas (ej. la lógica NO depende 
+  de la presentación ni de los datos hacia arriba).
+end note
+
+@enduml

@@ -1,0 +1,14 @@
+stateDiagram-v2
+    [*] --> RESERVADO: confirmarReserva() [matrícula vigente]
+    
+    RESERVADO --> PRESTADO: registrarEntrega()
+    RESERVADO --> [*]: cancelarReserva() [no recogido en 24h]
+    
+    PRESTADO --> DEVUELTO: registrarDevolucion() [antes de fecha límite]
+    PRESTADO --> VENCIDO: verificarVencimiento() [fecha límite superada]
+    
+    VENCIDO --> CON_MULTA: aplicarMulta()
+    
+    CON_MULTA --> DEVUELTO: registrarDevolucion() [multa pagada]
+    
+    DEVUELTO --> [*]

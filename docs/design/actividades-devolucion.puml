@@ -1,0 +1,51 @@
+@startuml actividades-devolucion
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam ActivityBackgroundColor #EEF2F8
+skinparam ActivityBorderColor #1A3A5C
+
+|Estudiante|
+start
+:Entrega el libro en el mostrador;
+
+|Bibliotecario|
+:Escanea el código de barras del libro;
+:Ingresa el CUI del estudiante;
+
+|Sistema|
+:Busca el préstamo activo;
+:Verifica la fecha límite;
+
+if (¿Fecha límite superada?) then (sí)
+    :Calcula días de retraso;
+    :Aplica monto de la multa;
+    
+    |Estudiante|
+    if (¿Paga la multa en este momento?) then (sí)
+        :Entrega el pago;
+        |Bibliotecario|
+        :Registra el pago en el sistema;
+        |Sistema|
+        :Cambia estado a DEVUELTO;
+    else (no)
+        |Sistema|
+        :Cambia estado a CON_MULTA;
+        :Bloquea nuevas reservas;
+    endif
+
+else (no)
+    |Sistema|
+    :Cambia estado a DEVUELTO;
+endif
+
+|Sistema|
+fork
+    :Suma 1 a las copias disponibles\ndel catálogo (libera stock);
+fork again
+    :Envía recibo y estado de cuenta\npor correo electrónico;
+end fork
+
+|Bibliotecario|
+:Almacena el libro en la estantería;
+stop
+@enduml

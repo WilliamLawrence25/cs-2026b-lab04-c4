@@ -1,0 +1,9 @@
+# Bitácora de uso de IA - Diseño Detallado (Lab 05)
+
+| # | Fecha | Herramienta | Prompt (resumen) | Qué propuso la IA | Qué verificamos o corregimos | Decisión |
+|---|---|---|---|---|---|---|
+| 1 | 2026-10-13 | Gemini | Genera diagrama de clases PlantUML para reservar libro validando matrícula, incluyendo puerto y adaptador. | Propuso el modelo correcto pero incluyó métodos de acceso a base de datos dentro de la clase `Libro`. | Contradice la arquitectura en capas. Los repositorios deben ir en su propia capa. Se eliminaron esos métodos. | Corregida |
+| 2 | 2026-10-13 | Gemini | Genera diagrama de secuencia PlantUML con fragmentos alt y opt para la reserva. | Creó la secuencia, pero olvidó incluir el actor principal (Estudiante) iniciando el flujo. | Se corrigió el código PlantUML agregando el actor y su mensaje hacia la interfaz web. | Corregida |
+| 3 | 2026-10-13 | Gemini | Genera máquina de estados en Mermaid para el Préstamo con al menos 5 estados. | Generó 8 estados excesivamente granulares (ej. `VERIFICANDO_SISTEMA`). | Se simplificó a los 5 estados reales del dominio de negocio definidos en la guía del laboratorio. | Corregida |
+| 4 | 2026-10-13 | Gemini | Genera el esqueleto en Python 3.10 con dataclasses a partir del código PlantUML. | Escribió implementaciones simuladas con `print()` para la API de la UNSA. | Se modificó para usar `NotImplementedError` y `ABC`, respetando el patrón de puertos y adaptadores. | Corregida |
+| 5 | 2026-10-13 | Gemini | Actúa como auditor. Verifica las reglas C1-C5 en estos diagramas. | Detectó correctamente omisiones operativas, pero inventó un ciclo de dependencias en el diagrama de paquetes. | Se registró el falso positivo en la tabla de consistencia; la IA se confundió con la sintaxis `..>` de PlantUML. | Aceptada parcialmente |

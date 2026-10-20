@@ -1,0 +1,3 @@
+BiblioUNSA es la plataforma que permite a los estudiantes de la universidad buscar y reservar libros desde sus computadoras o celulares. Al mismo tiempo, ayuda a los bibliotecarios a gestionar fácilmente estas reservas, realizar los préstamos físicos y controlar las multas. 
+
+Para que un estudiante pueda reservar, el sistema se conecta de forma invisible con el Sistema Académico de la UNSA para verificar que su matrícula esté activa, y utiliza Google Workspace para que todos ingresen de forma segura usando únicamente su correo institucional. Todo el proceso está centralizado y automatizado para modernizar el servicio, agilizar la atención y evitar trámites manuales en nuestra biblioteca.

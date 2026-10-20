@@ -47,11 +47,25 @@ workspace "BiblioUNSA" "Modelo C4 del Sistema de Bibliotecas de la UNSA" {
         bibliounsa.api.prestamos -> bibliounsa.db "Lee y escribe" "SQL/TCP"
         bibliounsa.api.multas -> bibliounsa.db "Lee y escribe" "SQL/TCP"
 
-        // Relaciones Nivel 3 (Componentes internos - Sin ciclos)
+        // Relaciones Nivel 3 (Componentes internos)
         bibliounsa.api.reservas -> bibliounsa.api.catalogo "Verifica y reserva stock"
         bibliounsa.api.prestamos -> bibliounsa.api.catalogo "Libera stock al devolver"
         bibliounsa.api.prestamos -> bibliounsa.api.multas "Genera multa si hay retraso"
         bibliounsa.api.prestamos -> bibliounsa.api.reservas "Actualiza estado de reserva"
+
+        // E5: ENTORNO DE DESPLIEGUE
+        produccion = deploymentEnvironment "Producción" {
+            deploymentNode "Dispositivo del Usuario" "" "Navegador Web (PC / Móvil)" {
+                containerInstance bibliounsa.web
+            }
+
+            deploymentNode "Data Center UNSA" "" "Servidor Ubuntu 24.04 LTS, 4 vCPU, 8 GB RAM" {
+                deploymentNode "Docker Compose" "" "Docker 27" {
+                    containerInstance bibliounsa.api
+                    containerInstance bibliounsa.db
+                }
+            }
+        }
     }
 
     views {
@@ -69,13 +83,19 @@ workspace "BiblioUNSA" "Modelo C4 del Sistema de Bibliotecas de la UNSA" {
             include *
             autolayout lr
         }
-        
+
         dynamic bibliounsa.api "ReservaLibro" "Dinámico: Estudiante reserva un libro validando matrícula." {
             estudiante -> bibliounsa.web "1. Solicita reservar un libro"
             bibliounsa.web -> bibliounsa.api.reservas "2. POST /api/reservas"
             bibliounsa.api.reservas -> sistemaAcademico "3. Verifica matrícula vigente"
             bibliounsa.api.reservas -> bibliounsa.api.catalogo "4. Valida y reduce stock disponible"
-            bibliounsa.api.reservas -> bibliounsa.db "5. Registra la reserva en la base de datos"
+            bibliounsa.api.reservas -> bibliounsa.db "5. Registra la reserva en la BD"
+            autolayout lr
+        }
+
+        // E5: VISTA DE DESPLIEGUE
+        deployment bibliounsa produccion "Despliegue" "Despliegue en producción (Data Center UNSA)." {
+            include *
             autolayout lr
         }
 

@@ -1,0 +1,3 @@
+# Comparación: UML vs C4 (Vista Dinámica)
+
+El diagrama de secuencia UML detalla la lógica de control exacta: muestra retornos, llamadas a métodos de clases, mensajes asíncronos y fragmentos alternativos (`alt`/`loop`), siendo ideal para que los **desarrolladores** implementen el código. Por otro lado, la vista dinámica de C4 omite estos detalles internos y de flujo para enfocarse únicamente en cómo interactúan los componentes y contenedores a alto nivel, siendo perfecta para que **arquitectos y líderes técnicos** entiendan la integración del sistema.

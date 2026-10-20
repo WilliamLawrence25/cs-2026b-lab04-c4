@@ -69,6 +69,15 @@ workspace "BiblioUNSA" "Modelo C4 del Sistema de Bibliotecas de la UNSA" {
             include *
             autolayout lr
         }
+        
+        dynamic bibliounsa.api "ReservaLibro" "Dinámico: Estudiante reserva un libro validando matrícula." {
+            estudiante -> bibliounsa.web "1. Solicita reservar un libro"
+            bibliounsa.web -> bibliounsa.api.reservas "2. POST /api/reservas"
+            bibliounsa.api.reservas -> sistemaAcademico "3. Verifica matrícula vigente"
+            bibliounsa.api.reservas -> bibliounsa.api.catalogo "4. Valida y reduce stock disponible"
+            bibliounsa.api.reservas -> bibliounsa.db "5. Registra la reserva en la base de datos"
+            autolayout lr
+        }
 
         styles {
             element "Person" {

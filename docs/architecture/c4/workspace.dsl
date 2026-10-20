@@ -7,8 +7,16 @@ workspace "BiblioUNSA" "Modelo C4 del Sistema de Bibliotecas de la UNSA" {
         bibliotecario = person "Bibliotecario" "Personal de la biblioteca encargado de gestionar préstamos y multas."
 
         bibliounsa = softwareSystem "BiblioUNSA" "Permite gestionar el catálogo de libros, reservas, préstamos y multas de la biblioteca." {
+            
             web = container "Aplicación Web" "Interfaz principal para estudiantes y bibliotecarios." "React / PWA" "Web Browser"
-            api = container "API REST" "Monolito en capas que procesa la lógica de negocio de préstamos y reservas." "Python / Django"
+            
+            api = container "API REST" "Monolito en capas que procesa la lógica de negocio de préstamos y reservas." "Python / Django" {
+                catalogo = component "Módulo Catálogo" "Gestiona la disponibilidad de libros y el inventario." "Django App"
+                reservas = component "Módulo Reservas" "Maneja la creación y validación de reservas de estudiantes." "Django App"
+                prestamos = component "Módulo Préstamos" "Gestiona el ciclo de vida del préstamo y las devoluciones." "Django App"
+                multas = component "Módulo Multas" "Calcula y registra penalizaciones por atrasos." "Django App"
+            }
+            
             db = container "Base de Datos" "Almacena información de catálogo, préstamos y multas." "PostgreSQL 16" "Database"
         }
 
@@ -24,10 +32,26 @@ workspace "BiblioUNSA" "Modelo C4 del Sistema de Bibliotecas de la UNSA" {
         // Relaciones Nivel 2 (Contenedores)
         estudiante -> bibliounsa.web "Usa" "HTTPS"
         bibliotecario -> bibliounsa.web "Usa" "HTTPS"
-        bibliounsa.web -> bibliounsa.api "Llama a" "HTTPS/JSON"
-        bibliounsa.api -> bibliounsa.db "Lee y escribe" "SQL/TCP"
-        bibliounsa.api -> sistemaAcademico "Valida matrícula" "HTTPS/JSON"
         bibliounsa.web -> ssoGoogle "Autentica usuario" "OAuth 2.0"
+
+        // Relaciones Nivel 3 (Componentes hacia afuera)
+        bibliounsa.web -> bibliounsa.api.catalogo "Consulta catálogo" "HTTPS/JSON"
+        bibliounsa.web -> bibliounsa.api.reservas "Gestiona reservas" "HTTPS/JSON"
+        bibliounsa.web -> bibliounsa.api.prestamos "Gestiona préstamos" "HTTPS/JSON"
+        bibliounsa.web -> bibliounsa.api.multas "Consulta multas" "HTTPS/JSON"
+
+        bibliounsa.api.reservas -> sistemaAcademico "Valida matrícula (ValidadorMatricula)" "HTTPS/JSON"
+
+        bibliounsa.api.catalogo -> bibliounsa.db "Lee y escribe" "SQL/TCP"
+        bibliounsa.api.reservas -> bibliounsa.db "Lee y escribe" "SQL/TCP"
+        bibliounsa.api.prestamos -> bibliounsa.db "Lee y escribe" "SQL/TCP"
+        bibliounsa.api.multas -> bibliounsa.db "Lee y escribe" "SQL/TCP"
+
+        // Relaciones Nivel 3 (Componentes internos - Sin ciclos)
+        bibliounsa.api.reservas -> bibliounsa.api.catalogo "Verifica y reserva stock"
+        bibliounsa.api.prestamos -> bibliounsa.api.catalogo "Libera stock al devolver"
+        bibliounsa.api.prestamos -> bibliounsa.api.multas "Genera multa si hay retraso"
+        bibliounsa.api.prestamos -> bibliounsa.api.reservas "Actualiza estado de reserva"
     }
 
     views {
@@ -37,6 +61,11 @@ workspace "BiblioUNSA" "Modelo C4 del Sistema de Bibliotecas de la UNSA" {
         }
 
         container bibliounsa "Contenedores" "Nivel 2: contenedores internos de BiblioUNSA." {
+            include *
+            autolayout lr
+        }
+
+        component bibliounsa.api "Componentes" "Nivel 3: módulos internos de la API REST." {
             include *
             autolayout lr
         }
@@ -58,6 +87,10 @@ workspace "BiblioUNSA" "Modelo C4 del Sistema de Bibliotecas de la UNSA" {
             element "Container" {
                 background #438DD5
                 color #ffffff
+            }
+            element "Component" {
+                background #85BBF0
+                color #000000
             }
             element "Database" {
                 shape cylinder

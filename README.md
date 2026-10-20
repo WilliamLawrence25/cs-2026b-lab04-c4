@@ -87,3 +87,42 @@ stateDiagram-v2
 - 🏗️ **Estructural:** [Diagrama de Clases](docs/design/img/clases.png) y [Diagrama de Paquetes](docs/design/img/paquetes.png)
 - ⚙️ **Comportamiento:** [Diagrama de Secuencia (Reserva)](docs/design/img/secuencia-reserva.png) y [Diagrama de Actividades (Devolución y Multa)](docs/design/img/actividades-devolucion.png)
 - 🔄 **Auditoría e IA:** [Análisis Round-Trip](docs/design/round-trip.md), [Reporte de Consistencia C1-C5](docs/design/consistencia.md) y [Bitácora de IA](docs/design/bitacora-ia.md).
+
+## Arquitectura C4 (Lab 06)
+
+El diseño arquitectónico del sistema BiblioUNSA ha sido modelado utilizando el enfoque de "Arquitectura como Código" mediante Structurizr DSL, garantizando la consistencia entre los distintos niveles de abstracción.
+
+### Nivel 1: Contexto del Sistema
+```mermaid
+C4Context
+  title Contexto de BiblioUNSA
+  
+  Person(estudiante, "Estudiante", "Estudiante matriculado en la UNSA")
+  Person(bibliotecario, "Bibliotecario", "Personal de la biblioteca")
+  
+  System(bibliounsa, "BiblioUNSA", "Gestión de catálogo, reservas y préstamos")
+  
+  System_Ext(sistemaAcademico, "Sistema Académico UNSA", "Validación de matrículas")
+  System_Ext(ssoGoogle, "Google Workspace", "SSO Institucional")
+
+  Rel(estudiante, bibliounsa, "Busca libros y realiza reservas")
+  Rel(bibliotecario, bibliounsa, "Gestiona préstamos y cobra multas")
+  Rel(bibliounsa, sistemaAcademico, "Valida matrícula vigente", "HTTPS/JSON")
+  Rel(bibliounsa, ssoGoogle, "Delega autenticación", "OAuth 2.0")
+  
+  UpdateLayoutConfig($c4ShapeInRow="3", $c4BoundaryInRow="1")
+```
+
+### Enlaces a las 5 Vistas del Modelo C4
+* 🌐 **Nivel 1 (Contexto):** [Ver diagrama de contexto](docs/architecture/c4/img/structurizr-Contexto.png)
+* 📦 **Nivel 2 (Contenedores):** [Ver diagrama de contenedores](docs/architecture/c4/img/structurizr-Contenedores.png)
+* 🧩 **Nivel 3 (Componentes):** [Ver diagrama de componentes](docs/architecture/c4/img/structurizr-Componentes.png)
+* 🔄 **Vista Dinámica (Reserva):** [Ver diagrama dinámico](docs/architecture/c4/img/structurizr-ReservaLibro.png)
+* 🚀 **Vista de Despliegue:** [Ver diagrama de despliegue](docs/architecture/c4/img/structurizr-Despliegue.png)
+
+### Auditoría y Documentación
+* [Inventario de elementos](docs/architecture/c4/inventario.md)
+* [Revisión con checklist C4](docs/architecture/c4/revision-c4.md)
+* [Explicación para público no técnico](docs/architecture/c4/explicacion.md)
+* [Bitácora de IA y falsos positivos](docs/architecture/c4/bitacora-ia.md)
+* [Comparación Modelado vs Diagramación](docs/architecture/c4/comparacion.md)

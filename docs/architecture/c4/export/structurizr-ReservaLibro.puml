@@ -1,0 +1,46 @@
+@startuml
+title <size:24>Dynamic View: BiblioUNSA - API REST</size>\n<size:24>Dinámico: Estudiante reserva un libro validando matrícula.</size>
+
+set separator none
+left to right direction
+
+<style>
+  root {
+    BackgroundColor: #ffffff
+    FontColor: #444444
+  }
+</style>
+
+!include <C4/C4>
+!include <C4/C4_Context>
+!include <C4/C4_Container>
+!include <C4/C4_Component>
+
+Person(Estudiante, "Estudiante", $descr="Estudiante matriculado en la UNSA que busca y reserva libros.", $tags="", $link="")
+
+System(SistemaAcadémicoUNSA, "Sistema Académico UNSA", $descr="Sistema central para validar matrículas.", $tags="", $link="")
+
+System_Boundary("BiblioUNSA_boundary", "BiblioUNSA", $tags="") {
+  Container_Boundary("BiblioUNSA.APIREST_boundary", "API REST", $tags="") {
+    Component(BiblioUNSA.APIREST.MóduloCatálogo, "Módulo Catálogo", $techn="Django App", $descr="Gestiona la disponibilidad de libros y el inventario.", $tags="", $link="")
+    Component(BiblioUNSA.APIREST.MóduloReservas, "Módulo Reservas", $techn="Django App", $descr="Maneja la creación y validación de reservas de estudiantes.", $tags="", $link="")
+  }
+
+  ContainerDb(BiblioUNSA.BasedeDatos, "Base de Datos", $techn="PostgreSQL 16", $descr="Almacena información de catálogo, préstamos y multas.", $tags="", $link="")
+  Container(BiblioUNSA.AplicaciónWeb, "Aplicación Web", $techn="React / PWA", $descr="Interfaz principal para estudiantes y bibliotecarios.", $tags="", $link="")
+}
+
+Person(Estudiante, "Estudiante", $descr="Estudiante matriculado en la UNSA que busca y reserva libros.", $tags="", $link="")
+Container(BiblioUNSA.AplicaciónWeb, "Aplicación Web", $techn="React / PWA", $descr="Interfaz principal para estudiantes y bibliotecarios.", $tags="", $link="")
+ContainerDb(BiblioUNSA.BasedeDatos, "Base de Datos", $techn="PostgreSQL 16", $descr="Almacena información de catálogo, préstamos y multas.", $tags="", $link="")
+System(SistemaAcadémicoUNSA, "Sistema Académico UNSA", $descr="Sistema central para validar matrículas.", $tags="", $link="")
+
+Rel(Estudiante, BiblioUNSA.AplicaciónWeb, "1: 1. Solicita reservar un libro", $techn="HTTPS", $tags="", $link="")
+Rel(BiblioUNSA.AplicaciónWeb, BiblioUNSA.APIREST.MóduloReservas, "2: 2. POST /api/reservas", $techn="HTTPS/JSON", $tags="", $link="")
+Rel(BiblioUNSA.APIREST.MóduloReservas, SistemaAcadémicoUNSA, "3: 3. Verifica matrícula vigente", $techn="HTTPS/JSON", $tags="", $link="")
+Rel(BiblioUNSA.APIREST.MóduloReservas, BiblioUNSA.APIREST.MóduloCatálogo, "4: 4. Valida y reduce stock disponible", $techn="", $tags="", $link="")
+Rel(BiblioUNSA.APIREST.MóduloReservas, BiblioUNSA.BasedeDatos, "5: 5. Registra la reserva en la BD", $techn="SQL/TCP", $tags="", $link="")
+
+SHOW_LEGEND(true)
+hide stereotypes
+@enduml

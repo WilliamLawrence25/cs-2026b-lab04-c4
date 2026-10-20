@@ -1,0 +1,30 @@
+@startuml
+title <size:24>System Context View: BiblioUNSA</size>\n<size:24>Nivel 1: BiblioUNSA y su entorno institucional.</size>
+
+set separator none
+left to right direction
+
+<style>
+  root {
+    BackgroundColor: #ffffff
+    FontColor: #444444
+  }
+</style>
+
+!include <C4/C4>
+!include <C4/C4_Context>
+
+Person(Estudiante, "Estudiante", $descr="Estudiante matriculado en la UNSA que busca y reserva libros.", $tags="", $link="")
+System(SistemaAcadémicoUNSA, "Sistema Académico UNSA", $descr="Sistema central para validar matrículas.", $tags="", $link="")
+System(GoogleWorkspace, "Google Workspace", $descr="SSO para autenticación institucional.", $tags="", $link="")
+Person(Bibliotecario, "Bibliotecario", $descr="Personal de la biblioteca encargado de gestionar préstamos y multas.", $tags="", $link="")
+System(BiblioUNSA, "BiblioUNSA", $descr="Permite gestionar el catálogo de libros, reservas, préstamos y multas de la biblioteca.", $tags="", $link="")
+
+Rel(Estudiante, BiblioUNSA, "Busca libros y realiza reservas", $techn="", $tags="", $link="")
+Rel(Bibliotecario, BiblioUNSA, "Gestiona préstamos y cobra multas", $techn="", $tags="", $link="")
+Rel(BiblioUNSA, SistemaAcadémicoUNSA, "Valida matrícula vigente", $techn="HTTPS/JSON", $tags="", $link="")
+Rel(BiblioUNSA, GoogleWorkspace, "Delega autenticación", $techn="OAuth 2.0", $tags="", $link="")
+
+SHOW_LEGEND(true)
+hide stereotypes
+@enduml

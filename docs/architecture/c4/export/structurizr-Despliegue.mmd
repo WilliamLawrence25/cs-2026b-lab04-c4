@@ -1,0 +1,31 @@
+graph LR
+  linkStyle default fill:#ffffff
+
+  subgraph diagram ["Deployment View: BiblioUNSA - Producción"]
+    style diagram fill:#ffffff,stroke:#ffffff
+
+    subgraph 36 ["Dispositivo del Usuario"]
+      style 36 fill:#ffffff,stroke:#444444,color:#444444
+
+      37["<div style='font-weight: bold'>Aplicación Web</div><div style='font-size: 70%; margin-top: 0px'>[Container: React / PWA]</div><div style='font-size: 80%; margin-top:10px'>Interfaz principal para<br />estudiantes y bibliotecarios.</div>"]
+      style 37 fill:#438dd5,stroke:#2e6295,color:#ffffff
+    end
+
+    subgraph 38 ["Data Center UNSA"]
+      style 38 fill:#ffffff,stroke:#444444,color:#444444
+
+      subgraph 39 ["Docker Compose"]
+        style 39 fill:#ffffff,stroke:#444444,color:#444444
+
+        40["<div style='font-weight: bold'>API REST</div><div style='font-size: 70%; margin-top: 0px'>[Container: Python / Django]</div><div style='font-size: 80%; margin-top:10px'>Monolito en capas que procesa<br />la lógica de negocio de<br />préstamos y reservas.</div>"]
+        style 40 fill:#438dd5,stroke:#2e6295,color:#ffffff
+        42[("<div style='font-weight: bold'>Base de Datos</div><div style='font-size: 70%; margin-top: 0px'>[Container: PostgreSQL 16]</div><div style='font-size: 80%; margin-top:10px'>Almacena información de<br />catálogo, préstamos y multas.</div>")]
+        style 42 fill:#438dd5,stroke:#2e6295,color:#ffffff
+      end
+
+    end
+
+    37-. "<div>Consulta catálogo</div><div style='font-size: 70%'>[HTTPS/JSON]</div>" .->40
+    40-. "<div>Lee y escribe</div><div style='font-size: 70%'>[SQL/TCP]</div>" .->42
+
+  end

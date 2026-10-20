@@ -1,0 +1,49 @@
+@startuml
+title <size:24>Component View: BiblioUNSA - API REST</size>\n<size:24>Nivel 3: módulos internos de la API REST.</size>
+
+set separator none
+left to right direction
+
+<style>
+  root {
+    BackgroundColor: #ffffff
+    FontColor: #444444
+  }
+</style>
+
+!include <C4/C4>
+!include <C4/C4_Context>
+!include <C4/C4_Container>
+!include <C4/C4_Component>
+
+System(SistemaAcadémicoUNSA, "Sistema Académico UNSA", $descr="Sistema central para validar matrículas.", $tags="", $link="")
+
+System_Boundary("BiblioUNSA_boundary", "BiblioUNSA", $tags="") {
+  Container_Boundary("BiblioUNSA.APIREST_boundary", "API REST", $tags="") {
+    Component(BiblioUNSA.APIREST.MóduloCatálogo, "Módulo Catálogo", $techn="Django App", $descr="Gestiona la disponibilidad de libros y el inventario.", $tags="", $link="")
+    Component(BiblioUNSA.APIREST.MóduloReservas, "Módulo Reservas", $techn="Django App", $descr="Maneja la creación y validación de reservas de estudiantes.", $tags="", $link="")
+    Component(BiblioUNSA.APIREST.MóduloPréstamos, "Módulo Préstamos", $techn="Django App", $descr="Gestiona el ciclo de vida del préstamo y las devoluciones.", $tags="", $link="")
+    Component(BiblioUNSA.APIREST.MóduloMultas, "Módulo Multas", $techn="Django App", $descr="Calcula y registra penalizaciones por atrasos.", $tags="", $link="")
+  }
+
+  ContainerDb(BiblioUNSA.BasedeDatos, "Base de Datos", $techn="PostgreSQL 16", $descr="Almacena información de catálogo, préstamos y multas.", $tags="", $link="")
+  Container(BiblioUNSA.AplicaciónWeb, "Aplicación Web", $techn="React / PWA", $descr="Interfaz principal para estudiantes y bibliotecarios.", $tags="", $link="")
+}
+
+Rel(BiblioUNSA.AplicaciónWeb, BiblioUNSA.APIREST.MóduloCatálogo, "Consulta catálogo", $techn="HTTPS/JSON", $tags="", $link="")
+Rel(BiblioUNSA.AplicaciónWeb, BiblioUNSA.APIREST.MóduloReservas, "Gestiona reservas", $techn="HTTPS/JSON", $tags="", $link="")
+Rel(BiblioUNSA.AplicaciónWeb, BiblioUNSA.APIREST.MóduloPréstamos, "Gestiona préstamos", $techn="HTTPS/JSON", $tags="", $link="")
+Rel(BiblioUNSA.AplicaciónWeb, BiblioUNSA.APIREST.MóduloMultas, "Consulta multas", $techn="HTTPS/JSON", $tags="", $link="")
+Rel(BiblioUNSA.APIREST.MóduloReservas, SistemaAcadémicoUNSA, "Valida matrícula (ValidadorMatricula)", $techn="HTTPS/JSON", $tags="", $link="")
+Rel(BiblioUNSA.APIREST.MóduloCatálogo, BiblioUNSA.BasedeDatos, "Lee y escribe", $techn="SQL/TCP", $tags="", $link="")
+Rel(BiblioUNSA.APIREST.MóduloReservas, BiblioUNSA.BasedeDatos, "Lee y escribe", $techn="SQL/TCP", $tags="", $link="")
+Rel(BiblioUNSA.APIREST.MóduloPréstamos, BiblioUNSA.BasedeDatos, "Lee y escribe", $techn="SQL/TCP", $tags="", $link="")
+Rel(BiblioUNSA.APIREST.MóduloMultas, BiblioUNSA.BasedeDatos, "Lee y escribe", $techn="SQL/TCP", $tags="", $link="")
+Rel(BiblioUNSA.APIREST.MóduloReservas, BiblioUNSA.APIREST.MóduloCatálogo, "Verifica y reserva stock", $techn="", $tags="", $link="")
+Rel(BiblioUNSA.APIREST.MóduloPréstamos, BiblioUNSA.APIREST.MóduloCatálogo, "Libera stock al devolver", $techn="", $tags="", $link="")
+Rel(BiblioUNSA.APIREST.MóduloPréstamos, BiblioUNSA.APIREST.MóduloMultas, "Genera multa si hay retraso", $techn="", $tags="", $link="")
+Rel(BiblioUNSA.APIREST.MóduloPréstamos, BiblioUNSA.APIREST.MóduloReservas, "Actualiza estado de reserva", $techn="", $tags="", $link="")
+
+SHOW_LEGEND(true)
+hide stereotypes
+@enduml

@@ -1,0 +1,46 @@
+graph LR
+  linkStyle default fill:#ffffff
+
+  subgraph diagram ["Dynamic View: BiblioUNSA - API REST"]
+    style diagram fill:#ffffff,stroke:#ffffff
+
+    1["<div style='font-weight: bold'>Estudiante</div><div style='font-size: 70%; margin-top: 0px'>[Person]</div><div style='font-size: 80%; margin-top:10px'>Estudiante matriculado en la<br />UNSA que busca y reserva<br />libros.</div>"]
+    style 1 fill:#08427b,stroke:#052e56,color:#ffffff
+
+    11["<div style='font-weight: bold'>Sistema Académico UNSA</div><div style='font-size: 70%; margin-top: 0px'>[Software System]</div><div style='font-size: 80%; margin-top:10px'>Sistema central para validar<br />matrículas.</div>"]
+    style 11 fill:#999999,stroke:#6b6b6b,color:#ffffff
+
+    subgraph 3 ["BiblioUNSA"]
+      style 3 fill:#ffffff,stroke:#0b4884,color:#0b4884
+
+      subgraph 5 ["API REST"]
+        style 5 fill:#ffffff,stroke:#2e6295,color:#2e6295
+
+        6["<div style='font-weight: bold'>Módulo Catálogo</div><div style='font-size: 70%; margin-top: 0px'>[Component: Django App]</div><div style='font-size: 80%; margin-top:10px'>Gestiona la disponibilidad de<br />libros y el inventario.</div>"]
+        style 6 fill:#85bbf0,stroke:#5d82a8,color:#000000
+        7["<div style='font-weight: bold'>Módulo Reservas</div><div style='font-size: 70%; margin-top: 0px'>[Component: Django App]</div><div style='font-size: 80%; margin-top:10px'>Maneja la creación y<br />validación de reservas de<br />estudiantes.</div>"]
+        style 7 fill:#85bbf0,stroke:#5d82a8,color:#000000
+      end
+
+      10[("<div style='font-weight: bold'>Base de Datos</div><div style='font-size: 70%; margin-top: 0px'>[Container: PostgreSQL 16]</div><div style='font-size: 80%; margin-top:10px'>Almacena información de<br />catálogo, préstamos y multas.</div>")]
+      style 10 fill:#438dd5,stroke:#2e6295,color:#ffffff
+      4["<div style='font-weight: bold'>Aplicación Web</div><div style='font-size: 70%; margin-top: 0px'>[Container: React / PWA]</div><div style='font-size: 80%; margin-top:10px'>Interfaz principal para<br />estudiantes y bibliotecarios.</div>"]
+      style 4 fill:#438dd5,stroke:#2e6295,color:#ffffff
+    end
+
+    1["<div style='font-weight: bold'>Estudiante</div><div style='font-size: 70%; margin-top: 0px'>[Person]</div><div style='font-size: 80%; margin-top:10px'>Estudiante matriculado en la<br />UNSA que busca y reserva<br />libros.</div>"]
+    style 1 fill:#08427b,stroke:#052e56,color:#ffffff
+    4["<div style='font-weight: bold'>Aplicación Web</div><div style='font-size: 70%; margin-top: 0px'>[Container: React / PWA]</div><div style='font-size: 80%; margin-top:10px'>Interfaz principal para<br />estudiantes y bibliotecarios.</div>"]
+    style 4 fill:#438dd5,stroke:#2e6295,color:#ffffff
+    10[("<div style='font-weight: bold'>Base de Datos</div><div style='font-size: 70%; margin-top: 0px'>[Container: PostgreSQL 16]</div><div style='font-size: 80%; margin-top:10px'>Almacena información de<br />catálogo, préstamos y multas.</div>")]
+    style 10 fill:#438dd5,stroke:#2e6295,color:#ffffff
+    11["<div style='font-weight: bold'>Sistema Académico UNSA</div><div style='font-size: 70%; margin-top: 0px'>[Software System]</div><div style='font-size: 80%; margin-top:10px'>Sistema central para validar<br />matrículas.</div>"]
+    style 11 fill:#999999,stroke:#6b6b6b,color:#ffffff
+
+    1-. "<div>1. 1. Solicita reservar un<br />libro</div><div style='font-size: 70%'>[HTTPS]</div>" .->4
+    4-. "<div>2. 2. POST /api/reservas</div><div style='font-size: 70%'>[HTTPS/JSON]</div>" .->7
+    7-. "<div>3. 3. Verifica matrícula<br />vigente</div><div style='font-size: 70%'>[HTTPS/JSON]</div>" .->11
+    7-. "<div>4. 4. Valida y reduce stock<br />disponible</div><div style='font-size: 70%'></div>" .->6
+    7-. "<div>5. 5. Registra la reserva en<br />la BD</div><div style='font-size: 70%'>[SQL/TCP]</div>" .->10
+
+  end

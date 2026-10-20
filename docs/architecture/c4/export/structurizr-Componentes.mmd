@@ -1,0 +1,46 @@
+graph LR
+  linkStyle default fill:#ffffff
+
+  subgraph diagram ["Component View: BiblioUNSA - API REST"]
+    style diagram fill:#ffffff,stroke:#ffffff
+
+    11["<div style='font-weight: bold'>Sistema Académico UNSA</div><div style='font-size: 70%; margin-top: 0px'>[Software System]</div><div style='font-size: 80%; margin-top:10px'>Sistema central para validar<br />matrículas.</div>"]
+    style 11 fill:#999999,stroke:#6b6b6b,color:#ffffff
+
+    subgraph 3 ["BiblioUNSA"]
+      style 3 fill:#ffffff,stroke:#0b4884,color:#0b4884
+
+      subgraph 5 ["API REST"]
+        style 5 fill:#ffffff,stroke:#2e6295,color:#2e6295
+
+        6["<div style='font-weight: bold'>Módulo Catálogo</div><div style='font-size: 70%; margin-top: 0px'>[Component: Django App]</div><div style='font-size: 80%; margin-top:10px'>Gestiona la disponibilidad de<br />libros y el inventario.</div>"]
+        style 6 fill:#85bbf0,stroke:#5d82a8,color:#000000
+        7["<div style='font-weight: bold'>Módulo Reservas</div><div style='font-size: 70%; margin-top: 0px'>[Component: Django App]</div><div style='font-size: 80%; margin-top:10px'>Maneja la creación y<br />validación de reservas de<br />estudiantes.</div>"]
+        style 7 fill:#85bbf0,stroke:#5d82a8,color:#000000
+        8["<div style='font-weight: bold'>Módulo Préstamos</div><div style='font-size: 70%; margin-top: 0px'>[Component: Django App]</div><div style='font-size: 80%; margin-top:10px'>Gestiona el ciclo de vida del<br />préstamo y las devoluciones.</div>"]
+        style 8 fill:#85bbf0,stroke:#5d82a8,color:#000000
+        9["<div style='font-weight: bold'>Módulo Multas</div><div style='font-size: 70%; margin-top: 0px'>[Component: Django App]</div><div style='font-size: 80%; margin-top:10px'>Calcula y registra<br />penalizaciones por atrasos.</div>"]
+        style 9 fill:#85bbf0,stroke:#5d82a8,color:#000000
+      end
+
+      10[("<div style='font-weight: bold'>Base de Datos</div><div style='font-size: 70%; margin-top: 0px'>[Container: PostgreSQL 16]</div><div style='font-size: 80%; margin-top:10px'>Almacena información de<br />catálogo, préstamos y multas.</div>")]
+      style 10 fill:#438dd5,stroke:#2e6295,color:#ffffff
+      4["<div style='font-weight: bold'>Aplicación Web</div><div style='font-size: 70%; margin-top: 0px'>[Container: React / PWA]</div><div style='font-size: 80%; margin-top:10px'>Interfaz principal para<br />estudiantes y bibliotecarios.</div>"]
+      style 4 fill:#438dd5,stroke:#2e6295,color:#ffffff
+    end
+
+    4-. "<div>Consulta catálogo</div><div style='font-size: 70%'>[HTTPS/JSON]</div>" .->6
+    4-. "<div>Gestiona reservas</div><div style='font-size: 70%'>[HTTPS/JSON]</div>" .->7
+    4-. "<div>Gestiona préstamos</div><div style='font-size: 70%'>[HTTPS/JSON]</div>" .->8
+    4-. "<div>Consulta multas</div><div style='font-size: 70%'>[HTTPS/JSON]</div>" .->9
+    7-. "<div>Valida matrícula<br />(ValidadorMatricula)</div><div style='font-size: 70%'>[HTTPS/JSON]</div>" .->11
+    6-. "<div>Lee y escribe</div><div style='font-size: 70%'>[SQL/TCP]</div>" .->10
+    7-. "<div>Lee y escribe</div><div style='font-size: 70%'>[SQL/TCP]</div>" .->10
+    8-. "<div>Lee y escribe</div><div style='font-size: 70%'>[SQL/TCP]</div>" .->10
+    9-. "<div>Lee y escribe</div><div style='font-size: 70%'>[SQL/TCP]</div>" .->10
+    7-. "<div>Verifica y reserva stock</div><div style='font-size: 70%'></div>" .->6
+    8-. "<div>Libera stock al devolver</div><div style='font-size: 70%'></div>" .->6
+    8-. "<div>Genera multa si hay retraso</div><div style='font-size: 70%'></div>" .->9
+    8-. "<div>Actualiza estado de reserva</div><div style='font-size: 70%'></div>" .->7
+
+  end

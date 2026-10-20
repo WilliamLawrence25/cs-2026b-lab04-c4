@@ -1,0 +1,23 @@
+graph LR
+  linkStyle default fill:#ffffff
+
+  subgraph diagram ["System Context View: BiblioUNSA"]
+    style diagram fill:#ffffff,stroke:#ffffff
+
+    1["<div style='font-weight: bold'>Estudiante</div><div style='font-size: 70%; margin-top: 0px'>[Person]</div><div style='font-size: 80%; margin-top:10px'>Estudiante matriculado en la<br />UNSA que busca y reserva<br />libros.</div>"]
+    style 1 fill:#08427b,stroke:#052e56,color:#ffffff
+    11["<div style='font-weight: bold'>Sistema Académico UNSA</div><div style='font-size: 70%; margin-top: 0px'>[Software System]</div><div style='font-size: 80%; margin-top:10px'>Sistema central para validar<br />matrículas.</div>"]
+    style 11 fill:#999999,stroke:#6b6b6b,color:#ffffff
+    12["<div style='font-weight: bold'>Google Workspace</div><div style='font-size: 70%; margin-top: 0px'>[Software System]</div><div style='font-size: 80%; margin-top:10px'>SSO para autenticación<br />institucional.</div>"]
+    style 12 fill:#999999,stroke:#6b6b6b,color:#ffffff
+    2["<div style='font-weight: bold'>Bibliotecario</div><div style='font-size: 70%; margin-top: 0px'>[Person]</div><div style='font-size: 80%; margin-top:10px'>Personal de la biblioteca<br />encargado de gestionar<br />préstamos y multas.</div>"]
+    style 2 fill:#08427b,stroke:#052e56,color:#ffffff
+    3["<div style='font-weight: bold'>BiblioUNSA</div><div style='font-size: 70%; margin-top: 0px'>[Software System]</div><div style='font-size: 80%; margin-top:10px'>Permite gestionar el catálogo<br />de libros, reservas,<br />préstamos y multas de la<br />biblioteca.</div>"]
+    style 3 fill:#1168bd,stroke:#0b4884,color:#ffffff
+
+    1-. "<div>Busca libros y realiza<br />reservas</div><div style='font-size: 70%'></div>" .->3
+    2-. "<div>Gestiona préstamos y cobra<br />multas</div><div style='font-size: 70%'></div>" .->3
+    3-. "<div>Valida matrícula vigente</div><div style='font-size: 70%'>[HTTPS/JSON]</div>" .->11
+    3-. "<div>Delega autenticación</div><div style='font-size: 70%'>[OAuth 2.0]</div>" .->12
+
+  end

@@ -75,3 +75,44 @@ def test_observer_nuevo_suscriptor_sin_tocar_el_servicio():
     servicio.procesar_reserva(reserva)
     
     assert auditor.notificado is True
+
+# Añadir al final de tests/test_patrones.py
+
+def test_chain_of_responsibility_bloquea_ia_alucinando():
+    from src.reservas.despues.ia import (
+        SimuladorLLMAdapter, GeneradorRecomendaciones, 
+        SinRecomendacionesExternas, FormatoLista
+    )
+    
+    # Simulamos que el LLM alucina y le dice al alumno que compre en Amazon
+    respuestas_falsas = {
+        "Recomienda 2 libros similares a 'Clean Code' de nuestro catálogo.": 
+        "No los tenemos, mejor ve a comprar The Pragmatic Programmer en Amazon."
+    }
+    llm_simulado = SimuladorLLMAdapter(respuestas_falsas)
+    
+    # Armamos la cadena: SinRecomendacionesExternas -> FormatoLista
+    cadena_guardrails = SinRecomendacionesExternas(FormatoLista())
+    generador = GeneradorRecomendaciones(llm_simulado, cadena_guardrails)
+    
+    # El guardrail debe interceptarlo y lanzar el error antes de mostrarlo al usuario
+    with pytest.raises(ValueError, match="fuentes externas"):
+        generador.recomendar("Clean Code")
+
+def test_chain_of_responsibility_permite_ia_correcta():
+    from src.reservas.despues.ia import (
+        SimuladorLLMAdapter, GeneradorRecomendaciones, 
+        SinRecomendacionesExternas, FormatoLista
+    )
+    
+    # Simulamos que el LLM se comporta bien y usa listas
+    respuestas_ok = {
+        "Recomienda 2 libros similares a 'Clean Code' de nuestro catálogo.": 
+        "- Refactoring\n- Clean Architecture"
+    }
+    llm_simulado = SimuladorLLMAdapter(respuestas_ok)
+    cadena_guardrails = SinRecomendacionesExternas(FormatoLista())
+    generador = GeneradorRecomendaciones(llm_simulado, cadena_guardrails)
+    
+    resultado = generador.recomendar("Clean Code")
+    assert "- Refactoring" in resultado

@@ -3,7 +3,7 @@ import pytest
 import importlib
 
 # Parametrizamos para probar la versión "antes" (y luego agregaremos "despues")
-@pytest.fixture(params=["src.reservas.antes.servicio"])
+@pytest.fixture(params=["src.reservas.antes.servicio", "src.reservas.despues.servicio"])
 def m(request):
     return importlib.import_module(request.param)
 

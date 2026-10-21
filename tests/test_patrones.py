@@ -35,3 +35,43 @@ def test_state_impide_transiciones_invalidas():
     # Comprobamos que el State bloquea el intento de confirmarlo
     with pytest.raises(ValueError, match="La reserva ya fue cancelada"):
         reserva.confirmar()
+
+# Añadir al final de tests/test_patrones.py
+def test_decorator_cache_evita_llamadas_repetidas():
+    from src.reservas.despues.estrategias import ValidadorMatriculaAdapter
+    from src.reservas.despues.decoradores import ValidadorConCache
+    
+    validador_base = ValidadorMatriculaAdapter()
+    validador_cacheado = ValidadorConCache(validador_base)
+    
+    # Primera llamada (debe ir al SDK real)
+    validador_cacheado.es_matricula_activa("70123456")
+    assert validador_cacheado.llamadas_reales == 1
+    
+    # Segunda y tercera llamada con el MISMO DNI (no debe ir al SDK real)
+    validador_cacheado.es_matricula_activa("70123456")
+    validador_cacheado.es_matricula_activa("70123456")
+    assert validador_cacheado.llamadas_reales == 1 # El contador NO aumentó
+
+def test_observer_nuevo_suscriptor_sin_tocar_el_servicio():
+    from src.reservas.despues.eventos import Suscriptor
+    
+    # Creamos un nuevo suscriptor al vuelo (Ej. Auditoría externa)
+    class AuditoriaObserver(Suscriptor):
+        def __init__(self):
+            self.notificado = False
+        def actualizar(self, evento, datos):
+            if evento == "reserva_confirmada":
+                self.notificado = True
+
+    auditor = AuditoriaObserver()
+    servicio = ServicioReservas()
+    
+    # Inyectamos el nuevo comportamiento sin modificar una sola línea de procesar_reserva()
+    servicio.publicador.suscribir("reserva_confirmada", auditor)
+    
+    estudiante = Estudiante("1", "a@a.com", "PREGRADO")
+    reserva = Reserva(estudiante, Libro("L1", "T", 1))
+    servicio.procesar_reserva(reserva)
+    
+    assert auditor.notificado is True

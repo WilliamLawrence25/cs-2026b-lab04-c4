@@ -114,7 +114,25 @@ C4Context
 ```
 
 ### Enlaces a las 5 Vistas del Modelo C4
-* 🌐 **Nivel 1 (Contexto):** [Ver diagrama de contexto](docs/architecture/c4/img/structurizr-Contexto.png)
+* 🌐 **Nivel 1 (Contexto):** [Ver diagrama de contexto](## Patrones de Diseño (Lab 07)
+
+Se aplicó refactorización hacia patrones GoF guiada por pruebas de caracterización y métricas (radon).
+
+### Resumen de Refactorización
+| Olor detectado | Patrón Aplicado | Prueba de verificación |
+| :--- | :--- | :--- |
+| if/elif anidados sobre `reserva.estado` | **State** | `test_state_impide_transiciones_invalidas` |
+| if/elif para cálculo de multas | **Strategy + Factory** | `test_open_closed_nuevo_tipo_sin_modificar_servicio` |
+| SDK de la UNSA fuertemente acoplado | **Adapter** | Pruebas de caracterización originales |
+| Notificaciones mezcladas en el servicio | **Observer** | `test_observer_nuevo_suscriptor_sin_tocar_el_servicio` |
+| Consultas repetitivas a APIs | **Decorator** | `test_decorator_cache_evita_llamadas_repetidas` |
+| IA generativa sin filtros | **Chain of Responsibility** | `test_chain_of_responsibility_bloquea_ia_alucinando` |
+
+### Métricas de Complejidad (procesar_reserva)
+| Métrica | Antes (Ingenua) | Después (Patrones) |
+| :--- | :--- | :--- |
+| **Complejidad (Radon)** | C (9) | A (2) |
+| **Líneas de código** | ~60 | ~200 |docs/architecture/c4/img/structurizr-Contexto.png)
 * 📦 **Nivel 2 (Contenedores):** [Ver diagrama de contenedores](docs/architecture/c4/img/structurizr-Contenedores.png)
 * 🧩 **Nivel 3 (Componentes):** [Ver diagrama de componentes](docs/architecture/c4/img/structurizr-Componentes.png)
 * 🔄 **Vista Dinámica (Reserva):** [Ver diagrama dinámico](docs/architecture/c4/img/structurizr-ReservaLibro.png)
@@ -126,3 +144,23 @@ C4Context
 * [Explicación para público no técnico](docs/architecture/c4/explicacion.md)
 * [Bitácora de IA y falsos positivos](docs/architecture/c4/bitacora-ia.md)
 * [Comparación Modelado vs Diagramación](docs/architecture/c4/comparacion.md)
+
+## Patrones de Diseño (Lab 07)
+
+Se aplicó refactorización hacia patrones GoF guiada por pruebas de caracterización y métricas (radon).
+
+### Resumen de Refactorización
+| Olor detectado | Patrón Aplicado | Prueba de verificación |
+| :--- | :--- | :--- |
+| if/elif anidados sobre `reserva.estado` | **State** | `test_state_impide_transiciones_invalidas` |
+| if/elif para cálculo de multas | **Strategy + Factory** | `test_open_closed_nuevo_tipo_sin_modificar_servicio` |
+| SDK de la UNSA fuertemente acoplado | **Adapter** | Pruebas de caracterización originales |
+| Notificaciones mezcladas en el servicio | **Observer** | `test_observer_nuevo_suscriptor_sin_tocar_el_servicio` |
+| Consultas repetitivas a APIs | **Decorator** | `test_decorator_cache_evita_llamadas_repetidas` |
+| IA generativa sin filtros | **Chain of Responsibility** | `test_chain_of_responsibility_bloquea_ia_alucinando` |
+
+### Métricas de Complejidad (procesar_reserva)
+| Métrica | Antes (Ingenua) | Después (Patrones) |
+| :--- | :--- | :--- |
+| **Complejidad (Radon)** | C (9) | A (2) |
+| **Líneas de código** | ~60 | ~200 |

@@ -1,0 +1,68 @@
+@startuml
+skinparam handwritten false
+skinparam classAttributeIconSize 0
+
+title Patrones de Diseño en BiblioUNSA (IA Aislada y Estados)
+
+package "Módulo IA (Strategy + Chain + Decorator)" {
+    class GeneradorRecomendaciones {
+        + recomendar(libro_base: str): str
+    }
+
+    interface ProveedorLLM <<Strategy>> {
+        + generar(prompt: str): str
+    }
+
+    class SimuladorLLMAdapter <<Adapter>> {
+        + generar(prompt: str): str
+    }
+
+    class LLMConCache <<Decorator>> {
+        - interno: ProveedorLLM
+        + generar(prompt: str): str
+    }
+
+    abstract class Guardrail <<Handler>> {
+        - siguiente: Guardrail
+        + validar(texto: str): str
+        # aplicar(texto: str): str
+    }
+
+    class SinRecomendacionesExternas <<ConcreteHandler>>
+    class FormatoLista <<ConcreteHandler>>
+
+    GeneradorRecomendaciones o--> ProveedorLLM : "Usa"
+    GeneradorRecomendaciones o--> Guardrail : "Valida salida"
+    
+    ProveedorLLM <|.. SimuladorLLMAdapter
+    ProveedorLLM <|.. LLMConCache
+    LLMConCache o--> ProveedorLLM : "Envuelve"
+
+    Guardrail <|-- SinRecomendacionesExternas
+    Guardrail <|-- FormatoLista
+    Guardrail o--> Guardrail : "Siguiente"
+}
+
+package "Módulo Reservas (State)" {
+    class Reserva {
+        - estado: EstadoReserva
+        + confirmar()
+        + cancelar()
+    }
+
+    abstract class EstadoReserva <<State>> {
+        + verificar_puede_procesar()
+        + confirmar(reserva)
+        + cancelar(reserva)
+    }
+
+    class Pendiente <<ConcreteState>>
+    class Confirmada <<ConcreteState>>
+    class Cancelada <<ConcreteState>>
+
+    Reserva o--> EstadoReserva : "Delega a"
+    EstadoReserva <|-- Pendiente
+    EstadoReserva <|-- Confirmada
+    EstadoReserva <|-- Cancelada
+}
+@enduml

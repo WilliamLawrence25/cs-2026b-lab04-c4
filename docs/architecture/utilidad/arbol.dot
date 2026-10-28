@@ -1,0 +1,46 @@
+digraph ArbolUtilidad {
+    rankdir=LR;
+    node [shape=box, style=rounded, fontname="Arial"];
+    edge [fontname="Arial"];
+
+    Utilidad [label="Utilidad\nBiblioUNSA 2.0", style="filled,rounded", fillcolor="#1f497d", fontcolor="white"];
+
+    // Atributos
+    Rend [label="Rendimiento", style="filled,rounded", fillcolor="#c0504d", fontcolor="white"];
+    Disp [label="Disponibilidad", style="filled,rounded", fillcolor="#c0504d", fontcolor="white"];
+    Seg [label="Seguridad", style="filled,rounded", fillcolor="#c0504d", fontcolor="white"];
+    Mod [label="Modificabilidad", style="filled,rounded", fillcolor="#c0504d", fontcolor="white"];
+
+    Utilidad -> Rend;
+    Utilidad -> Disp;
+    Utilidad -> Seg;
+    Utilidad -> Mod;
+
+    // Refinamientos
+    Rend1 [label="Latencia en búsquedas", style="filled,rounded", fillcolor="#f2dcdb"];
+    Disp1 [label="Falla del Sist. Académico", style="filled,rounded", fillcolor="#f2dcdb"];
+    Disp2 [label="Caída de nodo", style="filled,rounded", fillcolor="#f2dcdb"];
+    Seg1 [label="Aislamiento de facultades", style="filled,rounded", fillcolor="#f2dcdb"];
+    Seg2 [label="Privacidad de datos", style="filled,rounded", fillcolor="#f2dcdb"];
+    Mod1 [label="Nueva biblioteca virtual", style="filled,rounded", fillcolor="#f2dcdb"];
+
+    Rend -> Rend1;
+    Disp -> {Disp1, Disp2};
+    Seg -> {Seg1, Seg2};
+    Mod -> Mod1;
+
+    // Escenarios
+    Esc1 [label="(H,M) QA-01: 5000 alumnos buscan a la vez -> p95 de respuesta <= 1.5 s", shape=rect, style="rounded"];
+    Esc2 [label="(H,H) QA-02: API académica cae por 2h en matrícula -> 0 reservas perdidas (modo asíncrono/caché)", shape=rect, style="rounded"];
+    Esc3 [label="(M,M) QA-03: Falla de la base de datos principal -> RTO (Tiempo de recuperación) <= 5 min", shape=rect, style="rounded"];
+    Esc4 [label="(H,M) QA-04: Intento de acceso a reservas de otra facultad por URL -> 100% accesos bloqueados", shape=rect, style="rounded"];
+    Esc5 [label="(M,L) QA-05: Robo de base de datos -> Datos personales ilegibles (cifrado AES-256 en reposo)", shape=rect, style="rounded"];
+    Esc6 [label="(M,M) QA-06: Integrar proveedor de e-books -> <= 3 días-persona sin modificar código core", shape=rect, style="rounded"];
+
+    Rend1 -> Esc1;
+    Disp1 -> Esc2;
+    Disp2 -> Esc3;
+    Seg1 -> Esc4;
+    Seg2 -> Esc5;
+    Mod1 -> Esc6;
+}

@@ -1,15 +1,23 @@
 # Evaluación ATAM-lite (BiblioUNSA)
 
 **Evaluador:** Grupo Simulado (IA Adversaria)
-**Objetivo evaluado:** Iteración 1 de ADD (Disponibilidad ante caída de API Académica con Circuit Breaker + Outbox).
+**Objetivos evaluados:** QA-01 (Rendimiento), QA-02 (Disponibilidad), QA-04 (Seguridad).
 
 ## 1. Hallazgos y Respuestas del Equipo
 
-| Tipo | Hallazgo del Evaluador (IA / Otro Grupo) | Respuesta de nuestro equipo |
+| Tipo | Hallazgo del Evaluador | Respuesta de nuestro equipo |
 | :--- | :--- | :--- |
-| **Sensibilidad** | El tiempo de sincronización cuando la API regresa depende totalmente de la capacidad de procesamiento (throughput) del *worker* en background. | **Aceptado.** Si el worker procesa 10 req/s, tardará 100 segundos en vaciar una cola de 1000 reservas. Se debe monitorear la métrica de tamaño de cola. |
-| **Trade-off** | Disponibilidad vs Consistencia Estricta: Ganan 0 reservas perdidas, pero el usuario no sabe inmediatamente si su reserva es válida académicamente. | **Aceptado.** Es el costo arquitectónico. Lo mitigaremos a nivel de UI mostrando el mensaje: *"Reserva recibida, confirmación pendiente de validación académica"*. |
-| **Riesgo R1** | Si la API de la UNSA cae por días, la tabla Outbox crecerá infinitamente llenando el disco del VPS. (Probabilidad: 3, Impacto: 4) | **Aceptado.** Se mitigará implementando un límite de tiempo (TTL) para purgar reservas pendientes mayores a 24 horas y notificar al usuario. |
-| **Riesgo R2** | Problemas de concurrencia: si escalan a 2 *workers*, ambos podrían procesar la misma reserva en la cola Outbox. (Probabilidad: 2, Impacto: 5) | **Aceptado.** Para el MVP de 1 mes usamos 1 solo worker. A futuro se mitigará usando `SELECT ... FOR UPDATE SKIP LOCKED` en la base de datos. |
-| **No Riesgo** | Sobrecarga de escritura en la base de datos local al guardar las 1000 reservas diferidas en la tabla Outbox. | **Confirmado.** Escribir 1000 filas simples en PostgreSQL toma menos de 1 segundo, no afecta el rendimiento del monolito. |
-| **"Riesgo" (Falso Positivo IA)** | "Redis es obligatorio para usar colas de pendientes; PostgreSQL se va a bloquear". | **Rechazado.** Falso positivo por "sesgo hacia la moda". Para 1000 peticiones diarias, la tabla Outbox transaccional de PostgreSQL es más que suficiente y evita añadir la complejidad/costo de mantener un clúster de Redis[cite: 32]. |
+| **Sensibilidad** | El tiempo de recuperación post-caída depende del *throughput* del worker asíncrono. | **Aceptado.** Monitorearemos el tamaño de la cola Outbox. |
+| **Trade-off** | Rendimiento vs Stock Fresco: La caché de 30s puede mostrar stock fantasma. | **Aceptado.** Se valida el stock real en la base de datos al momento exacto de confirmar la reserva. |
+| **Trade-off** | Disponibilidad vs Consistencia Estricta (Circuit Breaker). | **Aceptado.** La UI informará que la confirmación de matrícula está en proceso. |
+| **Riesgo R1** | Llenado de disco por cola Outbox infinita si la API académica cae por días. | **Aceptado.** (Prob: 3, Impacto: 4). |
+| **Riesgo R2** | Un RLS mal configurado expone reservas de otras facultades. | **Aceptado.** (Prob: 2, Impacto: 5). |
+| **No Riesgo** | Sobrecarga por escrituras diferidas en PostgreSQL. | **Confirmado.** PostgreSQL soporta holgadamente las escrituras requeridas. |
+| **Falso Positivo** | "Redis es obligatorio para usar colas de pendientes; PostgreSQL se va a bloquear". | **Rechazado.** Para la carga de BiblioUNSA, la tabla Outbox transaccional de PostgreSQL es óptima. |
+
+## 2. Matriz de Riesgos y Mitigaciones (Zona Crítica)
+
+| Riesgo | Probabilidad (1-5) | Impacto (1-5) | Zona | Mitigación (Acción tomada) |
+| :--- | :--- | :--- | :--- | :--- |
+| **R1: Outbox infinito** | 3 | 4 | **Crítica (12)** | Se programará un TTL en el Worker para purgar o marcar como fallidas las reservas con más de 24h en cola. |
+| **R2: Fuga por RLS** | 2 | 5 | **Crítica (10)** | Mitigado implementando la Fitness Function `test_ff04_aislamiento_rls` en el pipeline CI/CD (E5) que bloquea el merge si el RLS falla. |

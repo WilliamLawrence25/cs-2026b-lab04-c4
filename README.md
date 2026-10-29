@@ -164,3 +164,19 @@ Se aplicó refactorización hacia patrones GoF guiada por pruebas de caracteriza
 | :--- | :--- | :--- |
 | **Complejidad (Radon)** | C (9) | A (2) |
 | **Líneas de código** | ~60 | ~200 |
+
+## Diseño de la Arquitectura (Lab 08)
+
+[![Fitness Functions](https://github.com/WilliamLawrence25/cs-2026b-lab04-c4/actions/workflows/fitness.yml/badge.svg)](https://github.com/TU_USUARIO/cs-2026b-lab04-c4/actions/workflows/fitness.yml)
+
+Se aplicó el método **Attribute-Driven Design (ADD 3.0)** para guiar la evolución de BiblioUNSA frente a su expansión a todas las facultades, validando cada decisión mediante simulaciones y *Fitness Functions*.
+
+### Árbol de Utilidad (Priorización)
+![Árbol de Utilidad](docs/architecture/utilidad/arbol.png)
+
+### Resumen de Iteraciones ADD
+| Escenario Prioritario | Táctica Adoptada | Evidencia | ¿Cumple? | ADR |
+| :--- | :--- | :--- | :--- | :--- |
+| **QA-02:** Caída de API Académica | Circuit Breaker + Outbox en BD Local | Simulación de Caída (0 reservas perdidas). | Sí | [ADR-006](docs/architecture/adr/006-disponibilidad-api-academica.md) |
+| **QA-01:** Búsquedas concurrentes | Optimizar Consultas (Índices) + Caché | Simulación M/G/c (p95 baja a 0.3s). | Sí | [ADR-007](docs/architecture/adr/007-rendimiento-busquedas.md) |
+| **QA-04:** Aislamiento de Facultades | Row-Level Security (RLS) en PostgreSQL | Prueba de Integración / Fitness Function. | Sí | [ADR-008](docs/architecture/adr/008-aislamiento-facultades-rls.md) |

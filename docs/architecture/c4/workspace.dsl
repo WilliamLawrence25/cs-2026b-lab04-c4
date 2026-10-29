@@ -1,4 +1,4 @@
-workspace "BiblioUNSA" "Modelo C4 del Sistema de Bibliotecas de la UNSA" {
+workspace "BiblioUNSA" "Modelo C4 del Sistema de Bibliotecas de la UNSA tras iteraciones ADD 3.0" {
 
     !identifiers hierarchical
 
@@ -10,14 +10,18 @@ workspace "BiblioUNSA" "Modelo C4 del Sistema de Bibliotecas de la UNSA" {
             
             web = container "Aplicación Web" "Interfaz principal para estudiantes y bibliotecarios." "React / PWA" "Web Browser"
             
-            api = container "API REST" "Monolito en capas que procesa la lógica de negocio de préstamos y reservas." "Python / Django" {
+            api = container "API REST" "Monolito en capas que procesa la lógica de negocio. Aplica multitenencia y RLS [QA-04]." "Python / Django" {
                 catalogo = component "Módulo Catálogo" "Gestiona la disponibilidad de libros y el inventario." "Django App"
                 reservas = component "Módulo Reservas" "Maneja la creación y validación de reservas de estudiantes." "Django App"
                 prestamos = component "Módulo Préstamos" "Gestiona el ciclo de vida del préstamo y las devoluciones." "Django App"
                 multas = component "Módulo Multas" "Calcula y registra penalizaciones por atrasos." "Django App"
             }
+
+            // NUEVOS CONTENEDORES (E6)
+            worker = container "Worker Asíncrono" "Procesa reservas diferidas de la tabla Outbox tras una caída [QA-02]." "Celery"
+            cache = container "Caché de Catálogo" "Almacena resultados de búsqueda de libros por 30s [QA-01]." "Redis"
             
-            db = container "Base de Datos" "Almacena información de catálogo, préstamos y multas." "PostgreSQL 16" "Database"
+            db = container "Base de Datos" "Almacena información. Aplica índices B-Tree [QA-01] y RLS por facultad [QA-04]." "PostgreSQL 16" "Database"
         }
 
         sistemaAcademico = softwareSystem "Sistema Académico UNSA" "Sistema central para validar matrículas." "Externo"
@@ -33,17 +37,23 @@ workspace "BiblioUNSA" "Modelo C4 del Sistema de Bibliotecas de la UNSA" {
         estudiante -> bibliounsa.web "Usa" "HTTPS"
         bibliotecario -> bibliounsa.web "Usa" "HTTPS"
         bibliounsa.web -> ssoGoogle "Autentica usuario" "OAuth 2.0"
+        
+        // Relaciones de los nuevos contenedores (Worker)
+        bibliounsa.worker -> bibliounsa.db "Lee tabla Outbox de reservas pendientes [QA-02]" "SQL/TCP"
+        bibliounsa.worker -> sistemaAcademico "Reintenta validaciones diferidas" "HTTPS/JSON"
 
-        // Relaciones Nivel 3 (Componentes hacia afuera)
+        // Relaciones Nivel 3 (Componentes hacia afuera y hacia contenedores internos)
         bibliounsa.web -> bibliounsa.api.catalogo "Consulta catálogo" "HTTPS/JSON"
         bibliounsa.web -> bibliounsa.api.reservas "Gestiona reservas" "HTTPS/JSON"
         bibliounsa.web -> bibliounsa.api.prestamos "Gestiona préstamos" "HTTPS/JSON"
         bibliounsa.web -> bibliounsa.api.multas "Consulta multas" "HTTPS/JSON"
 
-        bibliounsa.api.reservas -> sistemaAcademico "Valida matrícula (ValidadorMatricula)" "HTTPS/JSON"
+        bibliounsa.api.reservas -> sistemaAcademico "Valida matrícula (Circuit Breaker) [QA-02]" "HTTPS/JSON"
 
         bibliounsa.api.catalogo -> bibliounsa.db "Lee y escribe" "SQL/TCP"
-        bibliounsa.api.reservas -> bibliounsa.db "Lee y escribe" "SQL/TCP"
+        bibliounsa.api.catalogo -> bibliounsa.cache "Consulta y guarda catálogo en memoria [QA-01]" "TCP"
+        
+        bibliounsa.api.reservas -> bibliounsa.db "Guarda en cola Outbox ante caída [QA-02]" "SQL/TCP"
         bibliounsa.api.prestamos -> bibliounsa.db "Lee y escribe" "SQL/TCP"
         bibliounsa.api.multas -> bibliounsa.db "Lee y escribe" "SQL/TCP"
 
@@ -53,7 +63,7 @@ workspace "BiblioUNSA" "Modelo C4 del Sistema de Bibliotecas de la UNSA" {
         bibliounsa.api.prestamos -> bibliounsa.api.multas "Genera multa si hay retraso"
         bibliounsa.api.prestamos -> bibliounsa.api.reservas "Actualiza estado de reserva"
 
-        // E5: ENTORNO DE DESPLIEGUE
+        // ENTORNO DE DESPLIEGUE ACTUALIZADO
         produccion = deploymentEnvironment "Producción" {
             deploymentNode "Dispositivo del Usuario" "" "Navegador Web (PC / Móvil)" {
                 containerInstance bibliounsa.web
@@ -62,6 +72,8 @@ workspace "BiblioUNSA" "Modelo C4 del Sistema de Bibliotecas de la UNSA" {
             deploymentNode "Data Center UNSA" "" "Servidor Ubuntu 24.04 LTS, 4 vCPU, 8 GB RAM" {
                 deploymentNode "Docker Compose" "" "Docker 27" {
                     containerInstance bibliounsa.api
+                    containerInstance bibliounsa.worker
+                    containerInstance bibliounsa.cache
                     containerInstance bibliounsa.db
                 }
             }
@@ -74,7 +86,7 @@ workspace "BiblioUNSA" "Modelo C4 del Sistema de Bibliotecas de la UNSA" {
             autolayout lr
         }
 
-        container bibliounsa "Contenedores" "Nivel 2: contenedores internos de BiblioUNSA." {
+        container bibliounsa "Contenedores" "Nivel 2: contenedores internos de BiblioUNSA (incluyendo Worker y Caché)." {
             include *
             autolayout lr
         }
@@ -93,8 +105,7 @@ workspace "BiblioUNSA" "Modelo C4 del Sistema de Bibliotecas de la UNSA" {
             autolayout lr
         }
 
-        // E5: VISTA DE DESPLIEGUE
-        deployment bibliounsa produccion "Despliegue" "Despliegue en producción (Data Center UNSA)." {
+        deployment bibliounsa produccion "Despliegue" "Despliegue en producción con nuevos contenedores ADD 3.0." {
             include *
             autolayout lr
         }

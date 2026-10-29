@@ -1,0 +1,18 @@
+[importlinter]
+root_package = src
+
+[importlinter:contract:capas]
+name = FF-01 Capas del sistema sin ciclos (ADR-001)
+type = layers
+layers =
+    src.reservas.despues.servicio
+    src.reservas.despues.estrategias | src.reservas.despues.estados | src.reservas.despues.ia
+    src.reservas.externos
+
+[importlinter:contract:independencia_dominio]
+name = FF-02 Los estados del dominio no conocen sistemas externos (ADR-005)
+type = forbidden
+source_modules =
+    src.reservas.despues.estados
+forbidden_modules =
+    src.reservas.externos

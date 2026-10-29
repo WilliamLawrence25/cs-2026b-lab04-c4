@@ -1,0 +1,14 @@
+name: fitness-functions
+on: [push, pull_request]
+
+jobs:
+  arquitectura:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: 
+          python-version: "3.14"
+      - run: pip install pytest import-linter
+      - run: lint-imports
+      - run: PYTHONPATH=. pytest -v tests/test_fitness.py

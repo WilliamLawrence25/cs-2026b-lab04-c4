@@ -1,0 +1,3 @@
+Criterios de aceptación:
+1. Las pantallas cargan en menos de un segundo.
+2. La interfaz es intuitiva para todos.

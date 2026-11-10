@@ -1,0 +1,1 @@
+Se envía un correo electrónico usando un servidor SMTP cuando expira el plazo.

@@ -1,0 +1,3 @@
+Criterios de aceptación:
+1. Se crea el índice en PostgreSQL.
+2. La consulta SQL retorna optimizada.

@@ -1,0 +1,4 @@
+Criterios de aceptación:
+1. El estudiante puede buscar el libro.
+2. El sistema guarda la reserva en la base de datos.
+3. El libro queda apartado.

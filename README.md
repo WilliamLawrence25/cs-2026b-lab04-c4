@@ -180,3 +180,24 @@ Se aplicó el método **Attribute-Driven Design (ADD 3.0)** para guiar la evoluc
 | **QA-02:** Caída de API Académica | Circuit Breaker + Outbox en BD Local | Simulación de Caída (0 reservas perdidas). | Sí | [ADR-006](docs/architecture/adr/006-disponibilidad-api-academica.md) |
 | **QA-01:** Búsquedas concurrentes | Optimizar Consultas (Índices) + Caché | Simulación M/G/c (p95 baja a 0.3s). | Sí | [ADR-007](docs/architecture/adr/007-rendimiento-busquedas.md) |
 | **QA-04:** Aislamiento de Facultades | Row-Level Security (RLS) en PostgreSQL | Prueba de Integración / Fitness Function. | Sí | [ADR-008](docs/architecture/adr/008-aislamiento-facultades-rls.md) |
+
+## Prompt engineering (Lab 09)
+
+Implementación de prompts tratados como artefactos de software versionados, evaluados mediante `promptfoo` y validados contractualmente con `JSON Schema` detrás del puerto `ProveedorLLM` para el sistema **BiblioUNSA**[cite: 19, 22, 28].
+
+### Tabla de versiones y tasas de aprobación
+
+| Versión | Técnicas y elementos aplicados | Tarea A: Criterios de Aceptación (8 casos) | Tarea B: Text-to-SQL Solo Lectura (8 casos) |
+| :--- | :--- | :---: | :---: |
+| **`v1`** | *Zero-shot* ingenuo (solo instrucción directa sin formato ni restricciones)[cite: 20, 25]. | **0.0%** (0/8) | **0.0%** (0/8) |
+| **`v2`** | Patrones *Persona* y *Template* + contexto del dominio y esquema JSON[cite: 21, 25]. | **50.0%** (4/8) | **50.0%** (4/8) |
+| **`v3`** | 7 elementos de anatomía + *Cognitive Verifier*, *Flipped Interaction*, *Few-shot* y defensa en capas con delimitadores XML (`<historia>`, `<pregunta>`)[cite: 19, 21, 22, 26]. | **100.0%** (8/8) | **100.0%** (8/8) |
+
+### Gráfico de resultados
+
+![Tasa de aprobación por versión](docs/resultados_lab09.png)
+
+### Lecciones aprendidas
+1. **Un prompt es una especificación ejecutada por código:** Sin un contrato `JSON Schema` (`additionalProperties: false`) y restricciones explícitas de salida pura, los modelos envuelven las respuestas en bloques Markdown (` ```json `) o incluyen texto conversacional que rompe el parseo automático[cite: 19, 23, 25].
+2. **Defensa en capas contra inyección (OWASP LLM01):** Encapsular la entrada del usuario entre etiquetas XML (`<historia>`, `<pregunta>`), instruir explícitamente que el contenido delimitado es dato no confiable y validar la salida antes de tocar el dominio neutralizó ataques de inyección directa (`HACKED` y `DROP TABLE`)[cite: 22, 26].
+3. **Evaluación basada en propiedades frente al no determinismo:** Dado que un LLM varía alias SQL, orden de columnas y redacción entre ejecuciones idénticas, las aserciones deben comprobar estructura e invariantes (iniciar con `SELECT` y prohibir DDL/DML) respaldadas por respuestas grabadas (*fixtures*) para garantizar reproducibilidad en CI[cite: 21, 32, 33].

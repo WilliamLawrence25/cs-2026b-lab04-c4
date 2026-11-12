@@ -1,0 +1,37 @@
+name: Evaluacion de Prompts (Lab 09)
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  evals-prompts:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Descargar repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Configurar Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Instalar dependencias Python
+        run: pip install pytest jsonschema
+
+      - name: Evaluar Tarea A (Criterios de aceptacion)
+        run: npx promptfoo@latest eval --no-cache -o resultados.json
+
+      - name: Evaluar Tarea B (Text-to-SQL solo lectura)
+        run: npx promptfoo@latest eval -c prompts/sql/promptfooconfig.yaml --no-cache -o prompts/sql/resultados.json
+
+      - name: Ejecutar pruebas unitarias y guardrails
+        run: pytest tests/test_generadores_prompts.py -v

@@ -1,0 +1,1 @@
+{"pregunta_id": "S6", "permitida": false, "sql": "", "motivo": "Las columnas telefono y direccion no existen en el esquema permitido de BiblioUNSA"}

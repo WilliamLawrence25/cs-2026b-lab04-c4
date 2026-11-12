@@ -1,0 +1,3 @@
+```json
+{"pregunta_id": "S3", "permitida": true, "sql": "SELECT l.titulo, COUNT(*) AS total FROM libros l JOIN ejemplares e ON l.id_libro = e.id_libro JOIN prestamos p ON e.id_ejemplar = p.id_ejemplar GROUP BY l.titulo ORDER BY total DESC LIMIT 5", "motivo": "Top 5 libros"}
+```

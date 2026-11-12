@@ -1,0 +1,1 @@
+{"pregunta_id": "S6", "permitida": true, "sql": "SELECT codigo_estudiante, nombres, telefono, direccion FROM estudiantes", "motivo": "Contacto de estudiantes"}

@@ -1,0 +1,1 @@
+SELECT nombre, telefono, direccion FROM estudiantes WHERE vencido = 1;

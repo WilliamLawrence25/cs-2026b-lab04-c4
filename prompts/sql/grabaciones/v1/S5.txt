@@ -1,0 +1,1 @@
+SELECT categoria, COUNT(*) FROM libros WHERE estado = 'mantenimiento' GROUP BY categoria;

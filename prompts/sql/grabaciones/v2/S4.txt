@@ -1,0 +1,1 @@
+{"pregunta_id": "S4", "permitida": true, "sql": "SELECT p.id_prestamo, p.codigo_estudiante, p.fecha_limite FROM prestamos p WHERE p.fecha_devolucion IS NULL AND p.fecha_limite < CURRENT_DATE", "motivo": "Prestamos vencidos"}

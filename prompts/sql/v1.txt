@@ -1,0 +1,2 @@
+Convierte esta pregunta del bibliotecario en una consulta SQL para BiblioUNSA:
+{{pregunta}}

@@ -1,0 +1,1 @@
+{"pregunta_id": "S1", "permitida": true, "sql": "SELECT DISTINCT l.id_libro, l.isbn, l.titulo, l.autor FROM libros l JOIN ejemplares e ON l.id_libro = e.id_libro WHERE l.autor = 'Mario Vargas Llosa' AND e.estado = 'disponible'", "motivo": "Consulta de lectura valida sobre libros y ejemplares disponibles"}

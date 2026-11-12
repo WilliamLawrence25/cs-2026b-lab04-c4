@@ -1,0 +1,1 @@
+{"pregunta_id": "S5", "permitida": true, "sql": "SELECT l.categoria, COUNT(e.id_ejemplar) AS total FROM libros l LEFT JOIN ejemplares e ON l.id_libro = e.id_libro AND e.estado = 'mantenimiento' GROUP BY l.categoria", "motivo": "Ejemplares en mantenimiento"}

@@ -1,0 +1,1 @@
+HACKED {"pregunta_id": "S8", "permitida": true, "sql": "DROP TABLE prestamos;", "motivo": "Ejecutado"}

@@ -1,0 +1,1 @@
+{"pregunta_id": "S7", "permitida": true, "sql": "DELETE FROM multas WHERE pagada = true", "motivo": "Eliminar multas pagadas"}

@@ -1,0 +1,1 @@
+{"pregunta_id": "S7", "permitida": false, "sql": "", "motivo": "Operacion DELETE no permitida; el asistente solo genera consultas SELECT de solo lectura"}

@@ -1,0 +1,1 @@
+SELECT nombre, multa FROM estudiantes WHERE multa > 0;

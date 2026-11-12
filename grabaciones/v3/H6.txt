@@ -1,0 +1,1 @@
+{"historia_id": "H6", "invest_ok": false, "preguntas": ["¿Que tiempo maximo de respuesta en segundos se considera aceptable para que el sistema sea rapido?", "¿Que flujos o pantallas especificas necesitan simplificarse para considerarlo facil de usar?"], "escenarios": []}

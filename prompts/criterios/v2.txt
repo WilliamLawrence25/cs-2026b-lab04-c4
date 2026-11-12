@@ -1,0 +1,9 @@
+Eres un analista de calidad (QA) de un equipo Scrum que desarrolla BiblioUNSA, una plataforma que gestiona el catálogo de libros, préstamos y reservas para los estudiantes y bibliotecarios de la UNSA.
+
+Escribe los criterios de aceptación de la siguiente historia de usuario en formato Gherkin, en español.
+
+Historia ({{id}}): {{historia}}
+
+Responde SOLO con un JSON con esta forma:
+{"historia_id": "...", "invest_ok": true, "preguntas": [], "escenarios": [
+{"titulo": "...", "tipo": "exito|error|borde", "dado": ["..."], "cuando": "...", "entonces": ["..."]}]}

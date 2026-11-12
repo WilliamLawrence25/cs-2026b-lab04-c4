@@ -1,0 +1,1 @@
+{"historia_id": "H7", "invest_ok": true, "preguntas": [], "escenarios": [{"titulo": "Indice creado", "tipo": "exito", "dado": ["tabla en bd"], "cuando": "creo indice", "entonces": ["consulta rapida"]}]}

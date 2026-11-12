@@ -1,0 +1,1 @@
+{"historia_id": "H7", "invest_ok": false, "preguntas": ["¿Que funcionalidad o consulta del usuario final es la que actualmente presenta lentitud?", "¿Cual es el beneficio observable que percibira el estudiante o bibliotecario con esta mejora?"], "escenarios": []}

@@ -27,11 +27,11 @@ jobs:
       - name: Instalar dependencias Python
         run: pip install pytest jsonschema
 
-      - name: Evaluar Tarea A (Criterios de aceptacion)
-        run: npx promptfoo@latest eval --no-cache -o resultados.json
+      - name: Evaluar Tarea A (v3 - Criterios de aceptacion)
+        run: npx promptfoo@latest eval -p prompts/criterios/v3.txt --no-cache
 
-      - name: Evaluar Tarea B (Text-to-SQL solo lectura)
-        run: npx promptfoo@latest eval -c prompts/sql/promptfooconfig.yaml --no-cache -o prompts/sql/resultados.json
+      - name: Evaluar Tarea B (v3 - Text-to-SQL solo lectura)
+        run: npx promptfoo@latest eval -c prompts/sql/promptfooconfig.yaml -p prompts/sql/v3.txt --no-cache
 
       - name: Ejecutar pruebas unitarias y guardrails
         run: pytest tests/test_generadores_prompts.py -v

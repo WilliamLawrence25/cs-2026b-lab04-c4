@@ -1,0 +1,25 @@
+@startuml
+title Máquina de estados del agente ReAct — BiblioUNSA
+
+[*] --> INICIO
+INICIO --> DECIDIENDO
+DECIDIENDO --> VALIDANDO_CONTRATO
+
+VALIDANDO_CONTRATO --> CONTRATO_INVALIDO : decisión inválida
+CONTRATO_INVALIDO --> OBSERVANDO
+
+VALIDANDO_CONTRATO --> FINALIZADO : respuesta final válida
+FINALIZADO --> FIN
+
+VALIDANDO_CONTRATO --> EVALUANDO_POLITICA : acción válida
+EVALUANDO_POLITICA --> BLOQUEADO : política deniega
+BLOQUEADO --> OBSERVANDO
+EVALUANDO_POLITICA --> EJECUTANDO : política permite
+EJECUTANDO --> OBSERVANDO : resultado o error como observación
+
+OBSERVANDO --> DECIDIENDO : queda presupuesto de pasos
+OBSERVANDO --> LIMITE_ALCANZADO : se agotan los pasos
+LIMITE_ALCANZADO --> FIN
+
+FIN --> [*]
+@enduml

@@ -1,0 +1,24 @@
+{
+  "decisiones": [
+    {
+      "pensamiento": "Aplicaré el hallazgo del revisor manteniendo el validador opcional.",
+      "accion": "editar_archivo",
+      "args": {
+        "ruta": "src/prestamos/dominio.py",
+        "antes": "        if not self.validador.esta_matriculado(estudiante.cui):",
+        "despues": "        if self.validador is not None and not self.validador.esta_matriculado(estudiante.cui):"
+      }
+    },
+    {
+      "pensamiento": "Ejecutaré conjuntamente la regresión del issue y el caso de compatibilidad sin validador.",
+      "accion": "ejecutar_comando",
+      "args": {
+        "comando": "python -m pytest -q tests/test_issue_02_reservas.py pruebas_agente/test_issue02_compat.py"
+      }
+    },
+    {
+      "pensamiento": "Las dos pruebas pasan; dejaré el cambio al revisor para la aprobación final.",
+      "final": "Corregida la omisión: la matrícula se verifica si existe validador y siempre antes de reservar stock. ISSUE-02 y compatibilidad sin validador pasan."
+    }
+  ]
+}

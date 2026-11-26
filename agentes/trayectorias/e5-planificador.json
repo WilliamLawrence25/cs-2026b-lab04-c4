@@ -1,0 +1,22 @@
+{
+  "decisiones": [
+    {
+      "pensamiento": "Leeré el issue para delimitar el comportamiento y la condición de compatibilidad del cambio.",
+      "accion": "leer_archivo",
+      "args": {
+        "ruta": "issues/ISSUE-02.md"
+      }
+    },
+    {
+      "pensamiento": "Consultaré el mapa AST para encontrar el servicio y el método de reserva.",
+      "accion": "mapa_repo",
+      "args": {
+        "ruta": "src/prestamos"
+      }
+    },
+    {
+      "pensamiento": "El plan debe reproducir el caso, validar antes de reservar, conservar el comportamiento sin validador y dejar la revisión al rol de solo lectura.",
+      "final": "1) Leer ServicioPrestamos y reproducir ISSUE-02. 2) Validar la matrícula antes de crear el préstamo y consumir stock. 3) Ejecutar la prueba del issue. 4) El revisor comprobará el caso sin validador, el diff y las pruebas; el ejecutor no modifica tests."
+    }
+  ]
+}

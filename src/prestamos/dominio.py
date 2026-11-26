@@ -2,7 +2,7 @@ from enum import Enum
 from dataclasses import dataclass, field
 from typing import List, Optional
 from uuid import UUID, uuid4
-from datetime import datetime
+from datetime import datetime, timedelta
 from abc import ABC, abstractmethod
 
 class EstadoPrestamo(Enum):
@@ -44,8 +44,21 @@ class Multa:
     def calcular_dias_retraso(self) -> int:
         pass
 
+    def calcular_monto_atraso(self, fecha_limite: datetime, fecha_devolucion: datetime, tarifa_diaria: float = 2.0) -> float:
+        if fecha_devolucion <= fecha_limite:
+            return 0.0
+        fecha = fecha_limite.date() + timedelta(days=1)
+        dias = 0
+        while fecha <= fecha_devolucion.date():
+            if fecha.weekday() != 6:
+                dias += 1
+            fecha += timedelta(days=1)
+        self.monto = round(dias * tarifa_diaria, 2)
+        return self.monto
+
     def pagar(self) -> None:
         self.pagada = True
+
 
 @dataclass
 class Prestamo:
@@ -54,6 +67,7 @@ class Prestamo:
     id: UUID = field(default_factory=uuid4)
     fecha_inicio: datetime = field(default_factory=datetime.now)
     fecha_limite: datetime = field(default_factory=datetime.now)
+    fecha_devolucion: Optional[datetime] = None
     estado: EstadoPrestamo = EstadoPrestamo.RESERVADO
     multa: Optional[Multa] = None
 
@@ -75,6 +89,13 @@ class Prestamo:
         self.multa = Multa(monto=monto)
         self.estado = EstadoPrestamo.CON_MULTA
 
+    def esta_vencido(self, fecha_corte: datetime) -> bool:
+        return (
+            self.fecha_devolucion is None
+            and self.estado != EstadoPrestamo.DEVUELTO
+            and fecha_corte > self.fecha_limite
+        )
+
 class ValidadorMatricula(ABC):
     @abstractmethod
     def esta_matriculado(self, cui: str) -> bool:
@@ -85,5 +106,12 @@ class ApiUnsaAdapter(ValidadorMatricula):
         raise NotImplementedError("Integrar con la API del Sistema Académico")
 
 class ServicioPrestamos:
-    def crear_reserva(self, cui: str, isbn: str) -> Prestamo:
-        raise NotImplementedError("Lógica de servicio a implementar")
+    def __init__(self, validador: Optional[ValidadorMatricula] = None):
+        self.validador = validador
+
+    def crear_reserva(self, estudiante: Estudiante, libro: Libro) -> Prestamo:
+        if self.validador is not None and not self.validador.esta_matriculado(estudiante.cui):
+            raise ValueError("Matrícula vencida: no puede realizar reservas")
+        prestamo = Prestamo(estudiante=estudiante, libro=libro)
+        prestamo.confirmar_reserva(estudiante.cui, libro.isbn)
+        return prestamo

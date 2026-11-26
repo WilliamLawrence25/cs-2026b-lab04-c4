@@ -1,0 +1,51 @@
+{
+  "agente_unico": {
+    "rondas": 1,
+    "acciones": 6,
+    "acciones_por_rol": {
+      "agente-unico": 6
+    },
+    "acciones_bloqueadas": 0,
+    "acciones_bloqueadas_por_rol": {
+      "agente-unico": 0
+    },
+    "decisiones_rechazadas_contrato": 0,
+    "contexto_final_caracteres": 8996,
+    "contexto_por_rol": {
+      "e5-agente-unico-resultado": 8996
+    },
+    "revisor_encontro_algo_omitido_por_agente_unico": false,
+    "resultado": "ISSUE-02 corregido: se valida la matrícula antes de descontar inventario. La prueba específica pasa."
+  },
+  "actor_critico": {
+    "rondas": 2,
+    "acciones": 13,
+    "acciones_por_rol": {
+      "planificador": 2,
+      "ejecutor-r1": 3,
+      "revisor-r1": 3,
+      "ejecutor-r2": 2,
+      "revisor-r2": 3
+    },
+    "acciones_bloqueadas": 0,
+    "acciones_bloqueadas_por_rol": {
+      "planificador": 0,
+      "ejecutor-r1": 0,
+      "revisor-r1": 0,
+      "ejecutor-r2": 0,
+      "revisor-r2": 0
+    },
+    "decisiones_rechazadas_contrato": 0,
+    "contexto_final_caracteres": 28009,
+    "contexto_por_rol": {
+      "e5-planificador-resultado": 3710,
+      "e5-ejecutor-r1-resultado": 6299,
+      "e5-revisor-r1-resultado": 8268,
+      "e5-ejecutor-r2-resultado": 2879,
+      "e5-revisor-r2-resultado": 6853
+    },
+    "revisor_encontro_algo_omitido_por_agente_unico": true,
+    "plan": "1) Leer ServicioPrestamos y reproducir ISSUE-02. 2) Validar la matrícula antes de crear el préstamo y consumir stock. 3) Ejecutar la prueba del issue. 4) El revisor comprobará el caso sin validador, el diff y las pruebas; el ejecutor no modifica tests.",
+    "resultado_revisor": "APROBADO: la validación de matrícula precede al descuento de stock, el caso validador=None conserva compatibilidad y las dos pruebas pasan."
+  }
+}

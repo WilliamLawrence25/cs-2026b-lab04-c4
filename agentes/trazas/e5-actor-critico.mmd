@@ -1,0 +1,20 @@
+sequenceDiagram
+    autonumber
+    participant P as Planificador
+    participant E as Ejecutor
+    participant R as Revisor (solo lectura)
+    participant H as Repositorio y pruebas
+    P->>H: Lee ISSUE-02 y mapa AST
+    P-->>E: Plan: validar antes de reservar; revisar compatibilidad
+    E->>H: Ronda 1: agrega validación de matrícula
+    E->>H: Ejecuta test_issue_02_reservas.py
+    H-->>E: 1 passed
+    R->>H: Revisa diff y prueba con ServicioPrestamos() sin validador
+    H-->>R: Falla: AttributeError al invocar el validador None
+    R-->>E: CAMBIOS SOLICITADOS: proteger validador opcional
+    E->>H: Ronda 2: añade guard self.validador is not None
+    E->>H: Ejecuta prueba ISSUE-02 y prueba de compatibilidad
+    H-->>E: 2 passed
+    R->>H: Revisa diff y repite ambas pruebas
+    H-->>R: 2 passed; comportamiento compatible
+    R-->>P: APROBADO en la ronda 2

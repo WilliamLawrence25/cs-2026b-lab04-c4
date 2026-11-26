@@ -1,0 +1,18 @@
+{
+  "rondas": 1,
+  "acciones": 6,
+  "acciones_por_rol": {
+    "agente-unico": 6
+  },
+  "acciones_bloqueadas": 0,
+  "acciones_bloqueadas_por_rol": {
+    "agente-unico": 0
+  },
+  "decisiones_rechazadas_contrato": 0,
+  "contexto_final_caracteres": 8996,
+  "contexto_por_rol": {
+    "e5-agente-unico-resultado": 8996
+  },
+  "revisor_encontro_algo_omitido_por_agente_unico": false,
+  "resultado": "ISSUE-02 corregido: se valida la matrícula antes de descontar inventario. La prueba específica pasa."
+}

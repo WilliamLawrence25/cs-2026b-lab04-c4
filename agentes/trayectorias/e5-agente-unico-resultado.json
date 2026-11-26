@@ -1,0 +1,96 @@
+{
+  "modelo": "ModeloGrabado",
+  "decisiones": [
+    {
+      "paso": 1,
+      "respuesta": "{\"pensamiento\": \"Leeré ISSUE-02 para confirmar el requisito y la prueba asociada.\", \"accion\": \"leer_archivo\", \"args\": {\"ruta\": \"issues/ISSUE-02.md\"}}",
+      "decision": {
+        "pensamiento": "Leeré ISSUE-02 para confirmar el requisito y la prueba asociada.",
+        "accion": "leer_archivo",
+        "args": {
+          "ruta": "issues/ISSUE-02.md"
+        }
+      },
+      "contrato": "valida",
+      "motivo": ""
+    },
+    {
+      "paso": 2,
+      "respuesta": "{\"pensamiento\": \"Ejecutaré primero la prueba de matrícula vencida para reproducir el error.\", \"accion\": \"ejecutar_pruebas\", \"args\": {\"ruta\": \"tests/test_issue_02_reservas.py\"}}",
+      "decision": {
+        "pensamiento": "Ejecutaré primero la prueba de matrícula vencida para reproducir el error.",
+        "accion": "ejecutar_pruebas",
+        "args": {
+          "ruta": "tests/test_issue_02_reservas.py"
+        }
+      },
+      "contrato": "valida",
+      "motivo": ""
+    },
+    {
+      "paso": 3,
+      "respuesta": "{\"pensamiento\": \"Leeré el servicio y el modelo para ubicar dónde se descuenta el inventario.\", \"accion\": \"leer_archivo\", \"args\": {\"ruta\": \"src/prestamos/dominio.py\"}}",
+      "decision": {
+        "pensamiento": "Leeré el servicio y el modelo para ubicar dónde se descuenta el inventario.",
+        "accion": "leer_archivo",
+        "args": {
+          "ruta": "src/prestamos/dominio.py"
+        }
+      },
+      "contrato": "valida",
+      "motivo": ""
+    },
+    {
+      "paso": 4,
+      "respuesta": "{\"pensamiento\": \"Añadiré la validación de matrícula antes de crear y confirmar el préstamo.\", \"accion\": \"editar_archivo\", \"args\": {\"ruta\": \"src/prestamos/dominio.py\", \"antes\": \"        # BUG ISSUE-02: omite validar si la matricula del estudiante esta vigente\\n        prestamo = Prestamo(estudiante=estudiante, libro=libro)\\n\", \"despues\": \"        if not self.validador.esta_matriculado(estudiante.cui):\\n            raise ValueError(\\\"Matrícula vencida: no puede realizar reservas\\\")\\n        prestamo = Prestamo(estudiante=estudiante, libro=libro)\\n\"}}",
+      "decision": {
+        "pensamiento": "Añadiré la validación de matrícula antes de crear y confirmar el préstamo.",
+        "accion": "editar_archivo",
+        "args": {
+          "ruta": "src/prestamos/dominio.py",
+          "antes": "        # BUG ISSUE-02: omite validar si la matricula del estudiante esta vigente\n        prestamo = Prestamo(estudiante=estudiante, libro=libro)\n",
+          "despues": "        if not self.validador.esta_matriculado(estudiante.cui):\n            raise ValueError(\"Matrícula vencida: no puede realizar reservas\")\n        prestamo = Prestamo(estudiante=estudiante, libro=libro)\n"
+        }
+      },
+      "contrato": "valida",
+      "motivo": ""
+    },
+    {
+      "paso": 5,
+      "respuesta": "{\"pensamiento\": \"Verificaré que el caso de matrícula vencida ahora se rechace sin descontar una copia.\", \"accion\": \"ejecutar_pruebas\", \"args\": {\"ruta\": \"tests/test_issue_02_reservas.py\"}}",
+      "decision": {
+        "pensamiento": "Verificaré que el caso de matrícula vencida ahora se rechace sin descontar una copia.",
+        "accion": "ejecutar_pruebas",
+        "args": {
+          "ruta": "tests/test_issue_02_reservas.py"
+        }
+      },
+      "contrato": "valida",
+      "motivo": ""
+    },
+    {
+      "paso": 6,
+      "respuesta": "{\"pensamiento\": \"Inspeccionaré el diff para comprobar el alcance del cambio.\", \"accion\": \"ver_cambios\", \"args\": {\"ruta\": \"src/prestamos/dominio.py\"}}",
+      "decision": {
+        "pensamiento": "Inspeccionaré el diff para comprobar el alcance del cambio.",
+        "accion": "ver_cambios",
+        "args": {
+          "ruta": "src/prestamos/dominio.py"
+        }
+      },
+      "contrato": "valida",
+      "motivo": ""
+    },
+    {
+      "paso": 7,
+      "respuesta": "{\"pensamiento\": \"La prueba del issue pasa. Informaré el resultado del agente único.\", \"final\": \"ISSUE-02 corregido: se valida la matrícula antes de descontar inventario. La prueba específica pasa.\"}",
+      "decision": {
+        "pensamiento": "La prueba del issue pasa. Informaré el resultado del agente único.",
+        "final": "ISSUE-02 corregido: se valida la matrícula antes de descontar inventario. La prueba específica pasa."
+      },
+      "contrato": "valida",
+      "motivo": ""
+    }
+  ],
+  "contexto_final_caracteres": 8996
+}

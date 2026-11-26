@@ -1,0 +1,124 @@
+{
+  "modelo": "ModeloInteractivo",
+  "decisiones": [
+    {
+      "paso": 1,
+      "respuesta": "{\"pensamiento\":\"Primero revisaré la descripción del issue para confirmar el comportamiento esperado.\",\"accion\":\"leer_archivo\",\"args\":{\"ruta\":\"issues/ISSUE-01.md\"}}",
+      "decision": {
+        "pensamiento": "Primero revisaré la descripción del issue para confirmar el comportamiento esperado.",
+        "accion": "leer_archivo",
+        "args": {
+          "ruta": "issues/ISSUE-01.md"
+        }
+      },
+      "contrato": "valida",
+      "motivo": ""
+    },
+    {
+      "paso": 2,
+      "respuesta": "{\"pensamiento\":\"Reproduciré la falla con la prueba específica antes de cambiar el código.\",\"accion\":\"ejecutar_pruebas\",\"args\":{\"ruta\":\"tests/test_issue_01_multas.py\"}}",
+      "decision": {
+        "pensamiento": "Reproduciré la falla con la prueba específica antes de cambiar el código.",
+        "accion": "ejecutar_pruebas",
+        "args": {
+          "ruta": "tests/test_issue_01_multas.py"
+        }
+      },
+      "contrato": "valida",
+      "motivo": ""
+    },
+    {
+      "paso": 3,
+      "respuesta": "{\"pensamiento\":\"La prueba reproduce el cobro de tres días. Leeré el dominio de préstamos para localizar la causa.\",\"accion\":\"leer_archivo\",\"args\":{\"ruta\":\"src/prestamos/dominio.py\"}}",
+      "decision": {
+        "pensamiento": "La prueba reproduce el cobro de tres días. Leeré el dominio de préstamos para localizar la causa.",
+        "accion": "leer_archivo",
+        "args": {
+          "ruta": "src/prestamos/dominio.py"
+        }
+      },
+      "contrato": "valida",
+      "motivo": ""
+    },
+    {
+      "paso": 4,
+      "respuesta": "{\"pensamiento\":\"Localizaré las referencias del método para orientar el cambio a un único punto.\",\"accion\":\"buscar\",\"args\":{\"termino\":\"calcular_monto_atraso\",\"ruta\":\"src/prestamos/dominio.py\"}}",
+      "decision": {
+        "pensamiento": "Localizaré las referencias del método para orientar el cambio a un único punto.",
+        "accion": "buscar",
+        "args": {
+          "termino": "calcular_monto_atraso",
+          "ruta": "src/prestamos/dominio.py"
+        }
+      },
+      "contrato": "valida",
+      "motivo": ""
+    },
+    {
+      "paso": 5,
+      "respuesta": "{\"pensamiento\":\"El cálculo usa diferencia de fechas calendario. Añadiré timedelta al import para contar cada día desde el día siguiente al vencimiento.\",\"accion\":\"editar_archivo\",\"args\":{\"ruta\":\"src/prestamos/dominio.py\",\"antes\":\"from datetime import datetime\\n\",\"despues\":\"from datetime import datetime, timedelta\\n\"}}",
+      "decision": {
+        "pensamiento": "El cálculo usa diferencia de fechas calendario. Añadiré timedelta al import para contar cada día desde el día siguiente al vencimiento.",
+        "accion": "editar_archivo",
+        "args": {
+          "ruta": "src/prestamos/dominio.py",
+          "antes": "from datetime import datetime\n",
+          "despues": "from datetime import datetime, timedelta\n"
+        }
+      },
+      "contrato": "valida",
+      "motivo": ""
+    },
+    {
+      "paso": 6,
+      "respuesta": "{\"pensamiento\":\"Reemplazaré el conteo calendario por un conteo que excluya los domingos y mantenga el resto del cálculo.\",\"accion\":\"editar_archivo\",\"args\":{\"ruta\":\"src/prestamos/dominio.py\",\"antes\":\"        # BUG ISSUE-01: cuenta todos los dias calendario sin excluir domingos\\n        dias = (fecha_devolucion.date() - fecha_limite.date()).days\\n        self.monto = round(dias * tarifa_diaria, 2)\",\"despues\":\"        fecha = fecha_limite.date() + timedelta(days=1)\\n        dias = 0\\n        while fecha <= fecha_devolucion.date():\\n            if fecha.weekday() != 6:\\n                dias += 1\\n            fecha += timedelta(days=1)\\n        self.monto = round(dias * tarifa_diaria, 2)\"}}",
+      "decision": {
+        "pensamiento": "Reemplazaré el conteo calendario por un conteo que excluya los domingos y mantenga el resto del cálculo.",
+        "accion": "editar_archivo",
+        "args": {
+          "ruta": "src/prestamos/dominio.py",
+          "antes": "        # BUG ISSUE-01: cuenta todos los dias calendario sin excluir domingos\n        dias = (fecha_devolucion.date() - fecha_limite.date()).days\n        self.monto = round(dias * tarifa_diaria, 2)",
+          "despues": "        fecha = fecha_limite.date() + timedelta(days=1)\n        dias = 0\n        while fecha <= fecha_devolucion.date():\n            if fecha.weekday() != 6:\n                dias += 1\n            fecha += timedelta(days=1)\n        self.monto = round(dias * tarifa_diaria, 2)"
+        }
+      },
+      "contrato": "valida",
+      "motivo": ""
+    },
+    {
+      "paso": 7,
+      "respuesta": "{\"pensamiento\":\"Ejecutaré otra vez la prueba del issue para verificar la corrección.\",\"accion\":\"ejecutar_pruebas\",\"args\":{\"ruta\":\"tests/test_issue_01_multas.py\"}}",
+      "decision": {
+        "pensamiento": "Ejecutaré otra vez la prueba del issue para verificar la corrección.",
+        "accion": "ejecutar_pruebas",
+        "args": {
+          "ruta": "tests/test_issue_01_multas.py"
+        }
+      },
+      "contrato": "valida",
+      "motivo": ""
+    },
+    {
+      "paso": 8,
+      "respuesta": "{\"pensamiento\":\"Revisaré el diff para confirmar que el cambio se limita al cálculo de la multa.\",\"accion\":\"ver_cambios\",\"args\":{\"ruta\":\"src/prestamos/dominio.py\"}}",
+      "decision": {
+        "pensamiento": "Revisaré el diff para confirmar que el cambio se limita al cálculo de la multa.",
+        "accion": "ver_cambios",
+        "args": {
+          "ruta": "src/prestamos/dominio.py"
+        }
+      },
+      "contrato": "valida",
+      "motivo": ""
+    },
+    {
+      "paso": 9,
+      "respuesta": "{\"pensamiento\":\"La prueba del issue pasa y el cambio implementa la regla solicitada. Termino informando el resultado y los artefactos generados.\",\"final\":\"Issue-01 corregido: el cálculo de atraso excluye los domingos. La prueba tests/test_issue_01_multas.py pasa; el cambio se limita al conteo de días en src/prestamos/dominio.py. La traza JSONL y la trayectoria interactiva quedaron guardadas para su revisión.\"}",
+      "decision": {
+        "pensamiento": "La prueba del issue pasa y el cambio implementa la regla solicitada. Termino informando el resultado y los artefactos generados.",
+        "final": "Issue-01 corregido: el cálculo de atraso excluye los domingos. La prueba tests/test_issue_01_multas.py pasa; el cambio se limita al conteo de días en src/prestamos/dominio.py. La traza JSONL y la trayectoria interactiva quedaron guardadas para su revisión."
+      },
+      "contrato": "valida",
+      "motivo": ""
+    }
+  ]
+}

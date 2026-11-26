@@ -1,0 +1,61 @@
+sequenceDiagram
+    autonumber
+    participant A as Agente ReAct
+    participant M as ModeloGrabado
+    participant H as Herramientas del repositorio
+    Note over A: Estado INICIO
+    A->>M: Objetivo: Resuelve ISSUE-02. Reproduce el fallo, valida matrícula antes de reservar y comprueba la prueba específica....
+    Note over A: Estado DECIDIENDO, paso 1
+    Note over A: Estado VALIDANDO_CONTRATO, paso 1
+    Note over A: Estado EVALUANDO_POLITICA, paso 1
+    Note over A: Estado EJECUTANDO, paso 1
+    Note over A: Estado OBSERVANDO, paso 1
+    A->>M: Decisión 1: leer_archivo
+    A->>H: leer_archivo(ruta=issues/ISSUE-02.md)
+    H-->>A: # Issue #02: ServicioPrestamos permite reservar un libro con matrícula vencida  **Reportado por:** Coordinación Académica —...
+    Note over A: Estado DECIDIENDO, paso 2
+    Note over A: Estado VALIDANDO_CONTRATO, paso 2
+    Note over A: Estado EVALUANDO_POLITICA, paso 2
+    Note over A: Estado EJECUTANDO, paso 2
+    Note over A: Estado OBSERVANDO, paso 2
+    A->>M: Decisión 2: ejecutar_pruebas
+    A->>H: ejecutar_pruebas(ruta=tests/test_issue_02_reservas.py)
+    H-->>A: exit_code=1 F                                                                        [100%] ===================================...
+    Note over A: Estado DECIDIENDO, paso 3
+    Note over A: Estado VALIDANDO_CONTRATO, paso 3
+    Note over A: Estado EVALUANDO_POLITICA, paso 3
+    Note over A: Estado EJECUTANDO, paso 3
+    Note over A: Estado OBSERVANDO, paso 3
+    A->>M: Decisión 3: leer_archivo
+    A->>H: leer_archivo(ruta=src/prestamos/dominio.py)
+    H-->>A: from enum import Enum from dataclasses import dataclass, field from typing import List, Optional from uuid import UUID, uuid4...
+    Note over A: Estado DECIDIENDO, paso 4
+    Note over A: Estado VALIDANDO_CONTRATO, paso 4
+    Note over A: Estado EVALUANDO_POLITICA, paso 4
+    Note over A: Estado EJECUTANDO, paso 4
+    Note over A: Estado OBSERVANDO, paso 4
+    A->>M: Decisión 4: editar_archivo
+    A->>H: editar_archivo(ruta=src/prestamos/dominio.py)
+    H-->>A: OK: src/prestamos/dominio.py modificado
+    Note over A: Estado DECIDIENDO, paso 5
+    Note over A: Estado VALIDANDO_CONTRATO, paso 5
+    Note over A: Estado EVALUANDO_POLITICA, paso 5
+    Note over A: Estado EJECUTANDO, paso 5
+    Note over A: Estado OBSERVANDO, paso 5
+    A->>M: Decisión 5: ejecutar_pruebas
+    A->>H: ejecutar_pruebas(ruta=tests/test_issue_02_reservas.py)
+    H-->>A: exit_code=0 .                                                                        [100%] 1 passed in 0.01s
+    Note over A: Estado DECIDIENDO, paso 6
+    Note over A: Estado VALIDANDO_CONTRATO, paso 6
+    Note over A: Estado EVALUANDO_POLITICA, paso 6
+    Note over A: Estado EJECUTANDO, paso 6
+    Note over A: Estado OBSERVANDO, paso 6
+    A->>M: Decisión 6: ver_cambios
+    A->>H: ver_cambios(ruta=src/prestamos/dominio.py)
+    H-->>A: diff --git a/src/prestamos/dominio.py b/src/prestamos/dominio.py index 63f5e45..a8b368e 100644 --- a/src/prestamos/dominio.py +++...
+    Note over A: Estado DECIDIENDO, paso 7
+    Note over A: Estado VALIDANDO_CONTRATO, paso 7
+    Note over A: Estado FINALIZADO, paso 7
+    A->>M: Final: ISSUE-02 corregido: se valida la matrícula antes de descontar inventario. La prueba específica pasa.
+    M-->>A: FINALIZADO
+    Note over A: Estado FIN

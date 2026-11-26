@@ -201,3 +201,78 @@ Implementación de prompts tratados como artefactos de software versionados, eva
 1. **Un prompt es una especificación ejecutada por código:** Sin un contrato `JSON Schema` (`additionalProperties: false`) y restricciones explícitas de salida pura, los modelos envuelven las respuestas en bloques Markdown (` ```json `) o incluyen texto conversacional que rompe el parseo automático[cite: 19, 23, 25].
 2. **Defensa en capas contra inyección (OWASP LLM01):** Encapsular la entrada del usuario entre etiquetas XML (`<historia>`, `<pregunta>`), instruir explícitamente que el contenido delimitado es dato no confiable y validar la salida antes de tocar el dominio neutralizó ataques de inyección directa (`HACKED` y `DROP TABLE`)[cite: 22, 26].
 3. **Evaluación basada en propiedades frente al no determinismo:** Dado que un LLM varía alias SQL, orden de columnas y redacción entre ejecuciones idénticas, las aserciones deben comprobar estructura e invariantes (iniciar con `SELECT` y prohibir DDL/DML) respaldadas por respuestas grabadas (*fixtures*) para garantizar reproducibilidad en CI[cite: 21, 32, 33].
+
+## Sistemas agénticos (Lab 10)
+
+La arquitectura elegida usa un agente ReAct con contrato JSON, política de herramientas y máquina de estados. Para tareas pequeñas se ejecuta un agente único; en ISSUE-02 se comparó con coordinación planificador–ejecutor–revisor de solo lectura, limitada a dos rondas. La aprobación interactiva de ediciones se puede activar en el ejecutor. Las decisiones grabadas permiten repetir las trayectorias y pruebas sin claves externas.
+
+### Decisión arquitectónica
+
+La decisión completa, alternativas y consecuencias están en [ADR-010: arquitectura del sistema agéntico](docs/architecture/adr/010-sistema-agentico.md). La política limita los pasos, protege rutas de pruebas y restringe los comandos; el revisor no puede editar. El historial conserva el contexto de la ejecución y las notas de E4 sirven como memoria persistente. El [plan de delegación progresiva](agentes/delegacion.md) especifica los permisos humanos y del agente en cada nivel.
+
+### Máquina de estados ReAct
+
+![Máquina de estados del agente ReAct](agentes/diseno/estados.png)
+
+```mermaid
+stateDiagram-v2
+    [*] --> INICIO
+    INICIO --> DECIDIENDO
+    DECIDIENDO --> VALIDANDO_CONTRATO
+    VALIDANDO_CONTRATO --> CONTRATO_INVALIDO: decisión inválida
+    CONTRATO_INVALIDO --> OBSERVANDO
+    VALIDANDO_CONTRATO --> FINALIZADO: respuesta final válida
+    FINALIZADO --> FIN
+    VALIDANDO_CONTRATO --> EVALUANDO_POLITICA: acción válida
+    EVALUANDO_POLITICA --> BLOQUEADO: política deniega
+    BLOQUEADO --> OBSERVANDO
+    EVALUANDO_POLITICA --> EJECUTANDO: política permite
+    EJECUTANDO --> OBSERVANDO: resultado o error
+    OBSERVANDO --> DECIDIENDO: quedan pasos
+    OBSERVANDO --> LIMITE_ALCANZADO: se agotan los pasos
+    LIMITE_ALCANZADO --> FIN
+    FIN --> [*]
+```
+
+### Trayectoria del actor-crítico en ISSUE-02
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant P as Planificador
+    participant E as Ejecutor
+    participant R as Revisor (solo lectura)
+    participant H as Repositorio y pruebas
+    P->>H: Lee ISSUE-02 y mapa AST
+    P-->>E: Plan: validar antes de reservar; revisar compatibilidad
+    E->>H: Ronda 1: agrega validación de matrícula
+    E->>H: Ejecuta test_issue_02_reservas.py
+    H-->>E: 1 passed
+    R->>H: Revisa diff y prueba con ServicioPrestamos() sin validador
+    H-->>R: Falla: AttributeError al invocar el validador None
+    R-->>E: CAMBIOS SOLICITADOS: proteger validador opcional
+    E->>H: Ronda 2: añade guard self.validador is not None
+    E->>H: Ejecuta prueba ISSUE-02 y prueba de compatibilidad
+    H-->>E: 2 passed
+    R->>H: Revisa diff y repite ambas pruebas
+    H-->>R: 2 passed; comportamiento compatible
+    R-->>P: APROBADO en la ronda 2
+```
+
+Diagrama generado y artefactos: [traza Mermaid E5](agentes/trazas/e5-actor-critico.mmd), [comparación de métricas](agentes/resultados/e5-comparacion.json), [observación E7](observacion.md) y [bitácora de IA](bitacora-ia.md).
+
+### Métricas observadas (E7)
+
+Los pasos cuentan decisiones incluida la respuesta final; las acciones cuentan llamadas a herramientas.
+
+| Issue / ejecución | Pasos | Rondas | Herramientas utilizadas (acciones) | Decisiones rechazadas por contrato | Acciones bloqueadas | Contexto final |
+|---|---:|---:|---|---:|---:|---:|
+| ISSUE-01 — E2, agente ReAct | 9 | 1 | `leer_archivo`, `ejecutar_pruebas`, `buscar`, `editar_archivo`, `ver_cambios` (8) | 0 | 0 | 9.969 caracteres* |
+| ISSUE-02 — E5, agente único | 7 | 1 | `leer_archivo`, `ejecutar_pruebas`, `editar_archivo`, `ver_cambios` (6) | 0 | 0 | 8.996 caracteres |
+| ISSUE-02 — E5, actor-crítico | 18 | 2 | `leer_archivo`, `mapa_repo`, `editar_archivo`, `ejecutar_pruebas`, `ejecutar_comando`, `ver_cambios` (13) | 0 | 0 | 28.009 caracteres** |
+| ISSUE-03 — E4, agente ReAct | 9 | 1 | `mapa_repo`, `leer_archivo`, `ejecutar_pruebas`, `anotar`, `editar_archivo`, `ver_cambios`, `leer_notas` (8) | 0 | 0 | 10.686 caracteres |
+
+\* E2 no persistió su contador de contexto; se reconstruyó de la sesión.<br>
+\** El contexto multiagente suma los historiales de cinco participantes y no equivale al de una llamada individual.
+
+Para las evidencias y la interpretación completa de las métricas, consulta [observacion.md](observacion.md). El repositorio del proyecto es [github.com/WilliamLawrence25/cs-2026b-lab04-c4](https://github.com/WilliamLawrence25/cs-2026b-lab04-c4).

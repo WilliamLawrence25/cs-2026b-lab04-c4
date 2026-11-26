@@ -2,7 +2,7 @@ from enum import Enum
 from dataclasses import dataclass, field
 from typing import List, Optional
 from uuid import UUID, uuid4
-from datetime import datetime
+from datetime import datetime, timedelta
 from abc import ABC, abstractmethod
 
 class EstadoPrestamo(Enum):
@@ -47,8 +47,12 @@ class Multa:
     def calcular_monto_atraso(self, fecha_limite: datetime, fecha_devolucion: datetime, tarifa_diaria: float = 2.0) -> float:
         if fecha_devolucion <= fecha_limite:
             return 0.0
-        # BUG ISSUE-01: cuenta todos los dias calendario sin excluir domingos
-        dias = (fecha_devolucion.date() - fecha_limite.date()).days
+        fecha = fecha_limite.date() + timedelta(days=1)
+        dias = 0
+        while fecha <= fecha_devolucion.date():
+            if fecha.weekday() != 6:
+                dias += 1
+            fecha += timedelta(days=1)
         self.monto = round(dias * tarifa_diaria, 2)
         return self.monto
 

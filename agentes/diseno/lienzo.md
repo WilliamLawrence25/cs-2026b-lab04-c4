@@ -1,0 +1,13 @@
+# Lienzo de Diseño del Sistema Agéntico — BiblioUNSA
+
+Ruta del entregable E1 indicada por la guía: `agentes/diseno/lienzo.md`.
+
+| # | Decisión de diseño | Elección para BiblioUNSA | Justificación |
+| :---: | :--- | :--- | :--- |
+| **1** | **¿Agente o flujo de trabajo?** | **Agente** para resolver issues de código (y **flujo de trabajo fijo** para generación de criterios Gherkin del Lab 09). | En los issues de préstamos, multas y reservas el agente debe explorar los módulos de `src/`, localizar la regla de negocio defectuosa y verificar con `pytest`, por lo que los pasos no son fijos de antemano. En cambio, convertir una historia en Gherkin sigue siempre una secuencia fija y conviene mantenerlo como flujo determinista. |
+| **2** | **Arquetipo** | **Planificador-ejecutor + ReAct** (Sección 1.3). | El planificador descompone el issue en pasos cortos y legibles antes de tocar archivos, mientras el ejecutor usa el bucle ReAct (`Pensamiento → Acción → Observación`) para buscar funciones, editar el código y correr pruebas iterativamente. |
+| **3** | **Herramientas** | `listar_archivos`, `leer_archivo`, `buscar`, `editar_archivo`, `ejecutar_pruebas`, `ver_cambios`, `ejecutar_comando` (restringido) y `mapa_repo` / notas. | Principio de alcance mínimo: herramientas pequeñas y tipadas para inspeccionar, parchear exactamente 1 fragmento y validar con `pytest` y `radon`, evitando comandos arbitrarios de red o sistema. |
+| **4** | **Memoria** | **Memoria de corto plazo** (historial de sesión) + **memoria de notas** (`notas.md`). | El historial conserva las observaciones de la tarea actual; `notas.md` funciona como pizarra externa para registrar archivos revisados e hipótesis sin saturar la ventana de contexto. |
+| **5** | **Coordinación** | **Por gestor** (Planificador) + **Actor-crítico** (Ejecutor y Revisor de solo lectura, máx. 2 rondas) (Sección 1.7). | Separar el rol que modifica el código (Ejecutor) del rol que audita el `diff`, la complejidad y posibles inyecciones indirectas (Revisor sin permiso de escritura) eleva la calidad y aplica mínimo privilegio por rol. |
+| **6** | **Rol humano** | **Revisor** (aprobación consola `aprobar_edicion` y revisión final del Pull Request). | En la etapa inicial de delegación progresiva, el agente propone cambios pero un integrante del equipo aprueba cada edición y fusiona el PR. |
+| **7** | **Control y guardrails** | Contrato JSON estricto, sandbox en la raíz del repo, `tests/` protegido, máx. 12 pasos por agente, máx. 2 rondas y traza JSONL. | Evita bucles infinitos, impide que el agente altere las pruebas para hacerlas pasar y deja evidencia auditable de cada transición de estado. |

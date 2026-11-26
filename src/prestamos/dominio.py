@@ -44,8 +44,17 @@ class Multa:
     def calcular_dias_retraso(self) -> int:
         pass
 
+    def calcular_monto_atraso(self, fecha_limite: datetime, fecha_devolucion: datetime, tarifa_diaria: float = 2.0) -> float:
+        if fecha_devolucion <= fecha_limite:
+            return 0.0
+        # BUG ISSUE-01: cuenta todos los dias calendario sin excluir domingos
+        dias = (fecha_devolucion.date() - fecha_limite.date()).days
+        self.monto = round(dias * tarifa_diaria, 2)
+        return self.monto
+
     def pagar(self) -> None:
         self.pagada = True
+
 
 @dataclass
 class Prestamo:
@@ -54,6 +63,7 @@ class Prestamo:
     id: UUID = field(default_factory=uuid4)
     fecha_inicio: datetime = field(default_factory=datetime.now)
     fecha_limite: datetime = field(default_factory=datetime.now)
+    fecha_devolucion: Optional[datetime] = None
     estado: EstadoPrestamo = EstadoPrestamo.RESERVADO
     multa: Optional[Multa] = None
 
@@ -75,6 +85,10 @@ class Prestamo:
         self.multa = Multa(monto=monto)
         self.estado = EstadoPrestamo.CON_MULTA
 
+    def esta_vencido(self, fecha_corte: datetime) -> bool:
+        # BUG ISSUE-03: ignora si el prestamo ya fue devuelto
+        return fecha_corte > self.fecha_limite
+
 class ValidadorMatricula(ABC):
     @abstractmethod
     def esta_matriculado(self, cui: str) -> bool:
@@ -85,5 +99,11 @@ class ApiUnsaAdapter(ValidadorMatricula):
         raise NotImplementedError("Integrar con la API del Sistema Académico")
 
 class ServicioPrestamos:
-    def crear_reserva(self, cui: str, isbn: str) -> Prestamo:
-        raise NotImplementedError("Lógica de servicio a implementar")
+    def __init__(self, validador: Optional[ValidadorMatricula] = None):
+        self.validador = validador
+
+    def crear_reserva(self, estudiante: Estudiante, libro: Libro) -> Prestamo:
+        # BUG ISSUE-02: omite validar si la matricula del estudiante esta vigente
+        prestamo = Prestamo(estudiante=estudiante, libro=libro)
+        prestamo.confirmar_reserva(estudiante.cui, libro.isbn)
+        return prestamo

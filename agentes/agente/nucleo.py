@@ -33,6 +33,12 @@ class Agente:
             }
         )
 
+    def _transicionar(self, estado: str, paso: int | None = None) -> None:
+        evento = {"tipo": "estado", "estado": estado}
+        if paso is not None:
+            evento["paso"] = paso
+        self._registrar(**evento)
+
     def _guardar_evidencia(self) -> None:
         self.traza_archivo.parent.mkdir(parents=True, exist_ok=True)
         self.trayectoria_archivo.parent.mkdir(parents=True, exist_ok=True)
@@ -57,12 +63,15 @@ class Agente:
         inicio = time.perf_counter()
         objetivo = self.historial[0]["content"]
         conocidas = set(self.herramientas.catalogo())
+        self._transicionar("INICIO")
         self._registrar(tipo="objetivo", estado="INICIO", texto=objetivo)
         resultado_final = "(sin respuesta final)"
 
         for paso in range(1, self.politica.max_pasos + 1):
+            self._transicionar("DECIDIENDO", paso)
             decision = self.modelo.decidir(self.historial)
             respuesta = getattr(self.modelo, "ultima_respuesta", "")
+            self._transicionar("VALIDANDO_CONTRATO", paso)
             valida, motivo = validar_decision(decision, conocidas)
             self.decisiones.append(
                 {
@@ -81,6 +90,7 @@ class Agente:
             )
 
             if not valida:
+                self._transicionar("CONTRATO_INVALIDO", paso)
                 observacion = (
                     f"ERROR DE CONTRATO: {motivo}. "
                     "Responde solo con el JSON del protocolo."
@@ -95,8 +105,10 @@ class Agente:
                     observacion=observacion,
                     bloqueada=True,
                 )
+                self._transicionar("OBSERVANDO", paso)
             elif "final" in decision:
                 resultado_final = decision["final"]
+                self._transicionar("FINALIZADO", paso)
                 self._registrar(
                     tipo="final",
                     estado="FINALIZADO",
@@ -108,12 +120,15 @@ class Agente:
             else:
                 accion = decision["accion"]
                 args = decision.get("args", {})
+                self._transicionar("EVALUANDO_POLITICA", paso)
                 veredicto = self.politica.evaluar(accion, args, paso)
                 if veredicto.permitido:
+                    self._transicionar("EJECUTANDO", paso)
                     try:
                         observacion = getattr(self.herramientas, accion)(**args)
                     except Exception as error:
                         observacion = f"ERROR: {type(error).__name__}: {error}"
+                    self._transicionar("OBSERVANDO", paso)
                     self._registrar(
                         tipo="accion",
                         estado="OBSERVANDO",
@@ -125,7 +140,9 @@ class Agente:
                         bloqueada=False,
                     )
                 else:
+                    self._transicionar("BLOQUEADO", paso)
                     observacion = f"BLOQUEADO POR LA POLÍTICA: {veredicto.motivo}"
+                    self._transicionar("OBSERVANDO", paso)
                     self._registrar(
                         tipo="accion",
                         estado="BLOQUEADO",
@@ -140,6 +157,7 @@ class Agente:
                     {"role": "user", "content": f"Observación: {observacion}"}
                 )
         else:
+            self._transicionar("LIMITE_ALCANZADO", self.politica.max_pasos)
             self._registrar(
                 tipo="final",
                 estado="LIMITE_ALCANZADO",
@@ -148,6 +166,7 @@ class Agente:
             )
             resultado_final = "Se alcanzó el máximo de pasos sin una respuesta final."
 
+        self._transicionar("FIN")
         self._registrar(
             tipo="resumen",
             estado="FIN",

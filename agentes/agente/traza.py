@@ -36,7 +36,11 @@ def generar_diagrama(archivo_traza: Path) -> str:
     ]
     for evento in eventos:
         tipo = evento.get("tipo")
-        if tipo == "objetivo":
+        if tipo == "estado":
+            paso = evento.get("paso")
+            sufijo = f", paso {paso}" if paso is not None else ""
+            lineas.append(f"    Note over A: Estado {evento.get('estado')}{sufijo}")
+        elif tipo == "objetivo":
             lineas.append(f"    A->>M: Objetivo: {_mermaid_text(evento.get('texto', ''))}")
         elif tipo == "accion":
             paso = evento.get("paso", "?")

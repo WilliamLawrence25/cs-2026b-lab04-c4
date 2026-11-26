@@ -1,0 +1,31 @@
+{
+  "decisiones": [
+    {
+      "pensamiento": "Leeré el módulo para inspeccionar el servicio de préstamos.",
+      "accion": "leer_archivo",
+      "args": {
+        "ruta": "src/prestamos/dominio.py"
+      }
+    },
+    {
+      "pensamiento": "Añadiré la condición del issue antes de construir el préstamo.",
+      "accion": "editar_archivo",
+      "args": {
+        "ruta": "src/prestamos/dominio.py",
+        "antes": "        # BUG ISSUE-02: omite validar si la matricula del estudiante esta vigente\n        prestamo = Prestamo(estudiante=estudiante, libro=libro)\n",
+        "despues": "        if not self.validador.esta_matriculado(estudiante.cui):\n            raise ValueError(\"Matrícula vencida: no puede realizar reservas\")\n        prestamo = Prestamo(estudiante=estudiante, libro=libro)\n"
+      }
+    },
+    {
+      "pensamiento": "La prueba principal debe confirmar el rechazo de la matrícula vencida sin tocar stock.",
+      "accion": "ejecutar_pruebas",
+      "args": {
+        "ruta": "tests/test_issue_02_reservas.py"
+      }
+    },
+    {
+      "pensamiento": "La prueba específica pasa; entregaré el cambio al revisor.",
+      "final": "Validación implementada antes de descontar la copia. La prueba ISSUE-02 pasa; solicito revisión de compatibilidad y del diff."
+    }
+  ]
+}

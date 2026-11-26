@@ -53,3 +53,45 @@ En esta ejecución E4 no redujo los pasos y el contexto final fue 717 caracteres
 Ejecuta `./.venv/bin/pytest -q pruebas_agente tests/test_issue_03_prestamos.py` para validar las nuevas herramientas, la memoria y el arreglo del issue.
 
 Para el informe, captura la salida del mapa AST y de las notas recuperadas, el resultado de las pruebas E4 y el diagrama de secuencia de `e4-issue-03.mmd`.
+
+## E5: comparación de agente único y actor-crítico
+
+Ejecuta ambas variantes desde la raíz del repositorio:
+
+```bash
+./.venv/bin/python -m agentes.e5 --variante ambas
+```
+
+El modelo grabado reproduce las decisiones sin depender de un servicio externo. El agente único resuelve ISSUE-02 y comprueba su prueba específica. En la variante coordinada, planificador, ejecutor y revisor de solo lectura trabajan en un máximo de dos rondas. La primera solución valida una matrícula vencida, pero el revisor detecta que falla el comportamiento previo cuando `ServicioPrestamos` se crea sin validador; el ejecutor agrega el guard opcional en la segunda ronda.
+
+### Resultados observados
+
+| Medida | Agente único | Actor-crítico |
+| :--- | ---: | ---: |
+| Rondas | 1 | 2 |
+| Acciones de herramienta | 6 | 13 |
+| Acciones bloqueadas / decisiones rechazadas por contrato | 0 / 0 | 0 / 0 |
+| Contexto final acumulado | 8.996 caracteres | 28.009 caracteres |
+| Hallazgo del revisor que el agente único omitió | — | Sí: compatibilidad con `validador=None` |
+
+El agente único pasa la prueba de ISSUE-02, pero su guard incondicional falla la prueba de compatibilidad. El revisor reprodujo ese fallo en la ronda 1; tras el cambio pedido, ambas pruebas pasan (`2 passed`) y la revisión aprueba. El contexto coordinado suma el historial de los cinco participantes y no es una comparación de contexto por llamada directamente equivalente al agente único.
+
+### Conclusión de parsimonia
+
+El agente único necesitó una ronda y seis acciones, por lo que fue la alternativa más parsimoniosa.<br>
+Sin embargo, validó únicamente el caso de matrícula vencida y no comprobó la compatibilidad con el validador opcional.<br>
+El revisor detectó esta regresión con una prueba de reserva sin validador.<br>
+El ejecutor corrigió la condición en la segunda ronda y las dos pruebas terminaron aprobadas.<br>
+La coordinación elevó el trabajo a trece acciones y acumuló más contexto entre cinco participantes.<br>
+Ese contexto agregado no equivale al historial de una sola llamada y debe interpretarse con cautela.<br>
+Para un cambio pequeño puede bastar el agente único; la revisión aporta valor cuando hay comportamiento previo que preservar.
+
+### Evidencias para el informe
+
+- `trayectorias/e5-agente-unico.json` y `trazas/e5-agente-unico.jsonl`: fallo inicial reproducido y prueba específica aprobada tras el cambio.
+- `trayectorias/e5-planificador.json`, `e5-ejecutor-r1.json`, `e5-revisor-r1.json`, `e5-ejecutor-r2.json` y `e5-revisor-r2.json`, junto con sus trazas `.jsonl`: decisiones y observaciones de cada rol.
+- `resultados/e5-comparacion.json`: métricas por variante y por rol.
+- `trazas/e5-agente-unico.mmd` y `trazas/e5-actor-critico.mmd`: diagramas para capturar.
+- `../pruebas_agente/test_issue02_compat.py`: regresión de compatibilidad que motivó la segunda ronda.
+
+Para las capturas, ejecuta el comando anterior y captura el resumen de métricas en la terminal; abre `trazas/e5-actor-critico.mmd` y `resultados/e5-comparacion.json` en VS Code; finalmente captura la salida de `./.venv/bin/pytest -q tests/test_issue_02_reservas.py pruebas_agente/test_issue02_compat.py`.

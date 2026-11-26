@@ -49,7 +49,7 @@ class Agente:
         self.trayectoria_archivo.write_text(
             json.dumps(
                 {
-                    "modelo": "ModeloInteractivo",
+                    "modelo": type(self.modelo).__name__,
                     "decisiones": self.decisiones,
                     "contexto_final_caracteres": sum(
                         len(mensaje["content"]) for mensaje in self.historial
@@ -174,6 +174,7 @@ class Agente:
             tipo="resumen",
             estado="FIN",
             duracion_segundos=round(time.perf_counter() - inicio, 3),
+            modelo=type(self.modelo).__name__,
         )
         self._guardar_evidencia()
         return resultado_final

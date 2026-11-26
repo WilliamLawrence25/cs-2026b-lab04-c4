@@ -1,0 +1,52 @@
+{
+  "decisiones": [
+    {
+      "pensamiento": "Leeré ISSUE-02 para confirmar el requisito y la prueba asociada.",
+      "accion": "leer_archivo",
+      "args": {
+        "ruta": "issues/ISSUE-02.md"
+      }
+    },
+    {
+      "pensamiento": "Ejecutaré primero la prueba de matrícula vencida para reproducir el error.",
+      "accion": "ejecutar_pruebas",
+      "args": {
+        "ruta": "tests/test_issue_02_reservas.py"
+      }
+    },
+    {
+      "pensamiento": "Leeré el servicio y el modelo para ubicar dónde se descuenta el inventario.",
+      "accion": "leer_archivo",
+      "args": {
+        "ruta": "src/prestamos/dominio.py"
+      }
+    },
+    {
+      "pensamiento": "Añadiré la validación de matrícula antes de crear y confirmar el préstamo.",
+      "accion": "editar_archivo",
+      "args": {
+        "ruta": "src/prestamos/dominio.py",
+        "antes": "        # BUG ISSUE-02: omite validar si la matricula del estudiante esta vigente\n        prestamo = Prestamo(estudiante=estudiante, libro=libro)\n",
+        "despues": "        if not self.validador.esta_matriculado(estudiante.cui):\n            raise ValueError(\"Matrícula vencida: no puede realizar reservas\")\n        prestamo = Prestamo(estudiante=estudiante, libro=libro)\n"
+      }
+    },
+    {
+      "pensamiento": "Verificaré que el caso de matrícula vencida ahora se rechace sin descontar una copia.",
+      "accion": "ejecutar_pruebas",
+      "args": {
+        "ruta": "tests/test_issue_02_reservas.py"
+      }
+    },
+    {
+      "pensamiento": "Inspeccionaré el diff para comprobar el alcance del cambio.",
+      "accion": "ver_cambios",
+      "args": {
+        "ruta": "src/prestamos/dominio.py"
+      }
+    },
+    {
+      "pensamiento": "La prueba del issue pasa. Informaré el resultado del agente único.",
+      "final": "ISSUE-02 corregido: se valida la matrícula antes de descontar inventario. La prueba específica pasa."
+    }
+  ]
+}

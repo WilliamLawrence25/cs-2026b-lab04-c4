@@ -110,7 +110,8 @@ class ServicioPrestamos:
         self.validador = validador
 
     def crear_reserva(self, estudiante: Estudiante, libro: Libro) -> Prestamo:
-        # BUG ISSUE-02: omite validar si la matricula del estudiante esta vigente
+        if self.validador is not None and not self.validador.esta_matriculado(estudiante.cui):
+            raise ValueError("Matrícula vencida: no puede realizar reservas")
         prestamo = Prestamo(estudiante=estudiante, libro=libro)
         prestamo.confirmar_reserva(estudiante.cui, libro.isbn)
         return prestamo

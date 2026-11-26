@@ -27,11 +27,15 @@ def generar_diagrama(archivo_traza: Path) -> str:
         for linea in archivo_traza.read_text(encoding="utf-8").splitlines()
         if linea.strip()
     ]
+    modelo = next(
+        (evento["modelo"] for evento in eventos if evento.get("tipo") == "resumen" and "modelo" in evento),
+        "ModeloInteractivo",
+    )
     lineas = [
         "sequenceDiagram",
         "    autonumber",
         "    participant A as Agente ReAct",
-        "    participant M as ModeloInteractivo",
+        f"    participant M as {_mermaid_text(modelo)}",
         "    participant H as Herramientas del repositorio",
     ]
     for evento in eventos:

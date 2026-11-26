@@ -125,6 +125,15 @@ class Agente:
                 args = decision.get("args", {})
                 self._transicionar("EVALUANDO_POLITICA", paso)
                 veredicto = self.politica.evaluar(accion, args, paso)
+                if veredicto.aprobacion_humana is not None:
+                    self._registrar(
+                        tipo="aprobacion_humana",
+                        estado="APROBADA" if veredicto.aprobacion_humana else "RECHAZADA",
+                        paso=paso,
+                        accion=accion,
+                        ruta=args.get("ruta", ""),
+                        motivo=veredicto.motivo,
+                    )
                 if veredicto.permitido:
                     self._transicionar("EJECUTANDO", paso)
                     try:

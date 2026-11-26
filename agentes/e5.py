@@ -6,7 +6,7 @@ from typing import Any
 from agentes.agente.herramientas import Herramientas
 from agentes.agente.modelo_grabado import ModeloGrabado
 from agentes.agente.nucleo import Agente
-from agentes.agente.politica import Politica
+from agentes.agente.politica import Politica, aprobar_edicion_en_consola
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -179,12 +179,13 @@ def ejecutar_agente_unico() -> dict[str, Any]:
             DOMINIO.write_text(contenido_original, encoding="utf-8")
 
 
-def ejecutar_actor_critico() -> dict[str, Any]:
+def ejecutar_actor_critico(aprobar_ediciones: bool = False) -> dict[str, Any]:
+    prefijo_traza = "e6" if aprobar_ediciones else "e5"
     objetivo_plan = _objetivo("Prepara un plan breve y seguro para resolver ISSUE-02.")
     _, planificador = _ejecutar(
         "Planificador",
         "e5-planificador.json",
-        "e5-planificador.jsonl",
+        f"{prefijo_traza}-planificador.jsonl",
         objetivo_plan,
         Politica(
             herramientas_permitidas={"leer_archivo", "mapa_repo"},
@@ -209,9 +210,12 @@ def ejecutar_actor_critico() -> dict[str, Any]:
         _, ejecutor = _ejecutar(
             f"Ejecutor ronda {ronda}",
             f"e5-ejecutor-r{ronda}.json",
-            f"e5-ejecutor-r{ronda}.jsonl",
+            f"{prefijo_traza}-ejecutor-r{ronda}.jsonl",
             objetivo_ejecutor,
-            Politica(max_pasos=8),
+            Politica(
+                max_pasos=8,
+                aprobar_edicion=aprobar_edicion_en_consola if aprobar_ediciones else None,
+            ),
         )
         _validar_evidencia(ejecutor, [0], ediciones_exitosas=1)
         ejecutados.append(ejecutor)
@@ -224,7 +228,7 @@ def ejecutar_actor_critico() -> dict[str, Any]:
         resultado_revisor, revisor = _ejecutar(
             f"Revisor ronda {ronda}",
             f"e5-revisor-r{ronda}.json",
-            f"e5-revisor-r{ronda}.jsonl",
+            f"{prefijo_traza}-revisor-r{ronda}.jsonl",
             objetivo_revision,
             Politica(
                 herramientas_permitidas={
@@ -263,7 +267,14 @@ def ejecutar_actor_critico() -> dict[str, Any]:
 def main() -> None:
     parser = argparse.ArgumentParser(description="Reproduce las dos variantes de coordinación E5.")
     parser.add_argument("--variante", choices=("unico", "actor-critico", "ambas"), default="ambas")
+    parser.add_argument(
+        "--aprobar-ediciones",
+        action="store_true",
+        help="solicita aprobación por consola antes de cada edición del ejecutor",
+    )
     args = parser.parse_args()
+    if args.aprobar_ediciones and args.variante == "unico":
+        parser.error("--aprobar-ediciones requiere --variante actor-critico o ambas")
 
     contenido_original = DOMINIO.read_text(encoding="utf-8")
     contenido_base = _estado_inicial(contenido_original)
@@ -275,7 +286,13 @@ def main() -> None:
         if args.variante in ("actor-critico", "ambas"):
             DOMINIO.write_text(contenido_base, encoding="utf-8")
             print("=== Actor-crítico ===")
-            print(json.dumps(ejecutar_actor_critico(), ensure_ascii=False, indent=2))
+            print(
+                json.dumps(
+                    ejecutar_actor_critico(aprobar_ediciones=args.aprobar_ediciones),
+                    ensure_ascii=False,
+                    indent=2,
+                )
+            )
         if args.variante == "ambas":
             comparacion = {
                 "agente_unico": json.loads(

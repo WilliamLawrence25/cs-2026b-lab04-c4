@@ -95,3 +95,15 @@ Para un cambio pequeño puede bastar el agente único; la revisión aporta valor
 - `../pruebas_agente/test_issue02_compat.py`: regresión de compatibilidad que motivó la segunda ronda.
 
 Para las capturas, ejecuta el comando anterior y captura el resumen de métricas en la terminal; abre `trazas/e5-actor-critico.mmd` y `resultados/e5-comparacion.json` en VS Code; finalmente captura la salida de `./.venv/bin/pytest -q tests/test_issue_02_reservas.py pruebas_agente/test_issue02_compat.py`.
+
+## E6: aprobación humana y delegación progresiva
+
+La política del ejecutor permite activar aprobación por consola antes de cada edición. Ejecuta desde la raíz del repositorio:
+
+```bash
+./.venv/bin/python -m agentes.e5 --variante actor-critico --aprobar-ediciones
+```
+
+Inspecciona la ruta y los fragmentos que presenta el programa; escribe `s` para aprobar o `n` para rechazar. Otras respuestas no autorizan la edición y la solicitud vuelve a mostrarse. El resultado se registra como evento `aprobacion_humana` en la traza de cada ejecutor. Las pruebas cubren aprobación, rechazo, reintento de respuesta inválida y evidencia en JSONL: `./.venv/bin/pytest -q pruebas_agente/test_aprobacion_edicion.py`.
+
+La hoja [delegacion.md](delegacion.md) describe los permisos del agente y la evidencia requerida para avanzar por los roles ejecutor, revisor, colaborador y gobernador. Para el informe, captura la solicitud en consola con su respuesta y el evento correspondiente de `agentes/trazas/e6-ejecutor-r1.jsonl`; añade la tabla de la hoja de ruta y la salida de las pruebas E6.

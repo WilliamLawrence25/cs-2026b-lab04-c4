@@ -20,6 +20,9 @@ class Politica:
             "editar_archivo",
             "ver_cambios",
             "ejecutar_comando",
+            "mapa_repo",
+            "anotar",
+            "leer_notas",
         }
     )
     max_pasos: int = 12

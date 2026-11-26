@@ -1,0 +1,1 @@
+- 2026-11-26T09:20:20-05:00: ISSUE-03: Prestamo.esta_vencido compara solo fecha_corte con fecha_limite. La prueba repro se encuentra en tests/test_issue_03_prestamos.py y el método en src/prestamos/dominio.py. Hipótesis: debe retornar False si fecha_devolucion existe o el estado es DEVUELTO.

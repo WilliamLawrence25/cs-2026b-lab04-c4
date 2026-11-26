@@ -51,6 +51,9 @@ class Agente:
                 {
                     "modelo": "ModeloInteractivo",
                     "decisiones": self.decisiones,
+                    "contexto_final_caracteres": sum(
+                        len(mensaje["content"]) for mensaje in self.historial
+                    ),
                 },
                 ensure_ascii=False,
                 indent=2,

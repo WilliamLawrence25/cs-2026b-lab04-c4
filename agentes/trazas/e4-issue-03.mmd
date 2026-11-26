@@ -1,0 +1,77 @@
+sequenceDiagram
+    autonumber
+    participant A as Agente ReAct
+    participant M as ModeloInteractivo
+    participant H as Herramientas del repositorio
+    Note over A: Estado INICIO
+    A->>M: Objetivo: Resuelve el issue descrito en issues/ISSUE-03.md. Inspecciona el código, reproduce primero la falla, realiza...
+    Note over A: Estado DECIDIENDO, paso 1
+    Note over A: Estado VALIDANDO_CONTRATO, paso 1
+    Note over A: Estado EVALUANDO_POLITICA, paso 1
+    Note over A: Estado EJECUTANDO, paso 1
+    Note over A: Estado OBSERVANDO, paso 1
+    A->>M: Decisión 1: mapa_repo
+    A->>H: mapa_repo(ruta=src/prestamos)
+    H-->>A: src/prestamos/dominio.py   class EstadoPrestamo(Enum)   class Estudiante     def consultar_estado(self) -> str   class Libro    ...
+    Note over A: Estado DECIDIENDO, paso 2
+    Note over A: Estado VALIDANDO_CONTRATO, paso 2
+    Note over A: Estado EVALUANDO_POLITICA, paso 2
+    Note over A: Estado EJECUTANDO, paso 2
+    Note over A: Estado OBSERVANDO, paso 2
+    A->>M: Decisión 2: leer_archivo
+    A->>H: leer_archivo(ruta=src/prestamos/dominio.py)
+    H-->>A: from enum import Enum from dataclasses import dataclass, field from typing import List, Optional from uuid import UUID, uuid4...
+    Note over A: Estado DECIDIENDO, paso 3
+    Note over A: Estado VALIDANDO_CONTRATO, paso 3
+    Note over A: Estado EVALUANDO_POLITICA, paso 3
+    Note over A: Estado EJECUTANDO, paso 3
+    Note over A: Estado OBSERVANDO, paso 3
+    A->>M: Decisión 3: ejecutar_pruebas
+    A->>H: ejecutar_pruebas(ruta=tests/test_issue_03_prestamos.py)
+    H-->>A: exit_code=1 F                                                                        [100%] ===================================...
+    Note over A: Estado DECIDIENDO, paso 4
+    Note over A: Estado VALIDANDO_CONTRATO, paso 4
+    Note over A: Estado EVALUANDO_POLITICA, paso 4
+    Note over A: Estado EJECUTANDO, paso 4
+    Note over A: Estado OBSERVANDO, paso 4
+    A->>M: Decisión 4: anotar
+    A->>H: anotar(texto=ISSUE-03: Prestamo.esta_vencido compara solo...)
+    H-->>A: Nota guardada en agentes/notas.md
+    Note over A: Estado DECIDIENDO, paso 5
+    Note over A: Estado VALIDANDO_CONTRATO, paso 5
+    Note over A: Estado EVALUANDO_POLITICA, paso 5
+    Note over A: Estado EJECUTANDO, paso 5
+    Note over A: Estado OBSERVANDO, paso 5
+    A->>M: Decisión 5: editar_archivo
+    A->>H: editar_archivo(ruta=src/prestamos/dominio.py)
+    H-->>A: OK: src/prestamos/dominio.py modificado
+    Note over A: Estado DECIDIENDO, paso 6
+    Note over A: Estado VALIDANDO_CONTRATO, paso 6
+    Note over A: Estado EVALUANDO_POLITICA, paso 6
+    Note over A: Estado EJECUTANDO, paso 6
+    Note over A: Estado OBSERVANDO, paso 6
+    A->>M: Decisión 6: ejecutar_pruebas
+    A->>H: ejecutar_pruebas(ruta=tests/test_issue_03_prestamos.py)
+    H-->>A: exit_code=0 .                                                                        [100%] 1 passed in 0.01s
+    Note over A: Estado DECIDIENDO, paso 7
+    Note over A: Estado VALIDANDO_CONTRATO, paso 7
+    Note over A: Estado EVALUANDO_POLITICA, paso 7
+    Note over A: Estado EJECUTANDO, paso 7
+    Note over A: Estado OBSERVANDO, paso 7
+    A->>M: Decisión 7: ver_cambios
+    A->>H: ver_cambios(ruta=src/prestamos/dominio.py)
+    H-->>A: diff --git a/src/prestamos/dominio.py b/src/prestamos/dominio.py index 06d416d..360e1f8 100644 --- a/src/prestamos/dominio.py +++...
+    Note over A: Estado DECIDIENDO, paso 8
+    Note over A: Estado VALIDANDO_CONTRATO, paso 8
+    Note over A: Estado EVALUANDO_POLITICA, paso 8
+    Note over A: Estado EJECUTANDO, paso 8
+    Note over A: Estado OBSERVANDO, paso 8
+    A->>M: Decisión 8: leer_notas
+    A->>H: leer_notas()
+    H-->>A: - 2026-11-26T09:20:20-05:00: ISSUE-03: Prestamo.esta_vencido compara solo fecha_corte con fecha_limite. La prueba repro se...
+    Note over A: Estado DECIDIENDO, paso 9
+    Note over A: Estado VALIDANDO_CONTRATO, paso 9
+    Note over A: Estado FINALIZADO, paso 9
+    A->>M: Final: ISSUE-03 corregido: un préstamo con fecha de devolución o estado DEVUELTO ya no se marca vencido. La prueba...
+    M-->>A: FINALIZADO
+    Note over A: Estado FIN

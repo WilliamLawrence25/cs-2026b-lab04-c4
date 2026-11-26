@@ -1,3 +1,5 @@
+import ast
+from datetime import datetime
 from pathlib import Path
 import re
 import shlex
@@ -6,18 +8,22 @@ import sys
 
 
 class Herramientas:
-    def __init__(self, raiz: str | Path):
+    def __init__(self, raiz: str | Path, archivo_notas: str | Path | None = None):
         self.raiz = Path(raiz).resolve()
+        self.archivo_notas = Path(archivo_notas) if archivo_notas else self.raiz / "agentes/notas.md"
 
     def catalogo(self) -> dict[str, str]:
         return {
             "listar_archivos": "args: ruta (opcional)",
             "leer_archivo": "args: ruta",
             "buscar": "args: termino, ruta (opcional)",
+            "mapa_repo": "args: ruta (opcional); lista archivos Python, clases y firmas AST",
             "ejecutar_pruebas": "args: ruta (opcional)",
             "editar_archivo": "args: ruta, antes, despues",
             "ver_cambios": "args: ruta (opcional)",
             "ejecutar_comando": "args: comando (sujeto a lista permitida)",
+            "anotar": "args: texto; agrega hipótesis o archivos revisados a agentes/notas.md",
+            "leer_notas": "sin args; devuelve la memoria persistente de la tarea",
         }
 
     def _ruta(self, ruta: str) -> Path:
@@ -59,6 +65,59 @@ class Herramientas:
             if len(resultados) >= 50:
                 break
         return "\n".join(resultados) or "(sin coincidencias)"
+
+    @staticmethod
+    def _firma(funcion: ast.FunctionDef | ast.AsyncFunctionDef) -> str:
+        prefijo = "async def" if isinstance(funcion, ast.AsyncFunctionDef) else "def"
+        firma = f"{prefijo} {funcion.name}({ast.unparse(funcion.args)})"
+        if funcion.returns is not None:
+            firma += f" -> {ast.unparse(funcion.returns)}"
+        return firma
+
+    def mapa_repo(self, ruta: str = "src") -> str:
+        base = self._ruta(ruta)
+        excluidos = {".git", ".venv", "__pycache__", ".pytest_cache", "node_modules"}
+        archivos = [base] if base.is_file() else sorted(base.rglob("*.py"))
+        lineas = []
+
+        for archivo in archivos:
+            if not archivo.is_file() or excluidos.intersection(archivo.parts):
+                continue
+            arbol = ast.parse(archivo.read_text(encoding="utf-8"), filename=str(archivo))
+            lineas.append(f"{archivo.relative_to(self.raiz)}")
+            for nodo in ast.iter_child_nodes(arbol):
+                if isinstance(nodo, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                    lineas.append(f"  {self._firma(nodo)}")
+                elif isinstance(nodo, ast.ClassDef):
+                    bases = ", ".join(ast.unparse(base) for base in nodo.bases)
+                    sufijo = f"({bases})" if bases else ""
+                    lineas.append(f"  class {nodo.name}{sufijo}")
+                    for miembro in nodo.body:
+                        if isinstance(miembro, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                            lineas.append(f"    {self._firma(miembro)}")
+
+            if sum(len(linea) + 1 for linea in lineas) >= 8000:
+                lineas.append("[mapa truncado]")
+                break
+
+        return "\n".join(lineas) or "(sin módulos Python)"
+
+    def anotar(self, texto: str) -> str:
+        if not isinstance(texto, str) or not texto.strip():
+            raise ValueError("La nota debe contener texto no vacío")
+
+        archivo = self._ruta(str(self.archivo_notas))
+        archivo.parent.mkdir(parents=True, exist_ok=True)
+        marca_tiempo = datetime.now().astimezone().isoformat(timespec="seconds")
+        with archivo.open("a", encoding="utf-8") as notas:
+            notas.write(f"- {marca_tiempo}: {texto.strip()}\n")
+        return f"Nota guardada en {archivo.relative_to(self.raiz)}"
+
+    def leer_notas(self) -> str:
+        archivo = self._ruta(str(self.archivo_notas))
+        if not archivo.exists():
+            return "(sin notas registradas)"
+        return archivo.read_text(encoding="utf-8")
 
     def ejecutar_pruebas(self, ruta: str = "tests/test_issue_01_multas.py") -> str:
         destino = self._ruta(ruta)

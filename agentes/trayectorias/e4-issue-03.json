@@ -1,0 +1,120 @@
+{
+  "modelo": "ModeloInteractivo",
+  "decisiones": [
+    {
+      "paso": 1,
+      "respuesta": "{\"pensamiento\":\"Mapearé los módulos de préstamos con AST para ubicar la estructura y firmas del dominio.\",\"accion\":\"mapa_repo\",\"args\":{\"ruta\":\"src/prestamos\"}}",
+      "decision": {
+        "pensamiento": "Mapearé los módulos de préstamos con AST para ubicar la estructura y firmas del dominio.",
+        "accion": "mapa_repo",
+        "args": {
+          "ruta": "src/prestamos"
+        }
+      },
+      "contrato": "valida",
+      "motivo": ""
+    },
+    {
+      "paso": 2,
+      "respuesta": "{\"pensamiento\":\"Leeré el código donde se implementa la consulta de vencimiento antes de cambiarlo.\",\"accion\":\"leer_archivo\",\"args\":{\"ruta\":\"src/prestamos/dominio.py\"}}",
+      "decision": {
+        "pensamiento": "Leeré el código donde se implementa la consulta de vencimiento antes de cambiarlo.",
+        "accion": "leer_archivo",
+        "args": {
+          "ruta": "src/prestamos/dominio.py"
+        }
+      },
+      "contrato": "valida",
+      "motivo": ""
+    },
+    {
+      "paso": 3,
+      "respuesta": "{\"pensamiento\":\"Reproduciré el issue para confirmar el fallo antes de editar.\",\"accion\":\"ejecutar_pruebas\",\"args\":{\"ruta\":\"tests/test_issue_03_prestamos.py\"}}",
+      "decision": {
+        "pensamiento": "Reproduciré el issue para confirmar el fallo antes de editar.",
+        "accion": "ejecutar_pruebas",
+        "args": {
+          "ruta": "tests/test_issue_03_prestamos.py"
+        }
+      },
+      "contrato": "valida",
+      "motivo": ""
+    },
+    {
+      "paso": 4,
+      "respuesta": "{\"pensamiento\":\"Guardaré la hipótesis y los archivos revisados en la memoria del agente.\",\"accion\":\"anotar\",\"args\":{\"texto\":\"ISSUE-03: Prestamo.esta_vencido compara solo fecha_corte con fecha_limite. La prueba repro se encuentra en tests/test_issue_03_prestamos.py y el método en src/prestamos/dominio.py. Hipótesis: debe retornar False si fecha_devolucion existe o el estado es DEVUELTO.\"}}",
+      "decision": {
+        "pensamiento": "Guardaré la hipótesis y los archivos revisados en la memoria del agente.",
+        "accion": "anotar",
+        "args": {
+          "texto": "ISSUE-03: Prestamo.esta_vencido compara solo fecha_corte con fecha_limite. La prueba repro se encuentra en tests/test_issue_03_prestamos.py y el método en src/prestamos/dominio.py. Hipótesis: debe retornar False si fecha_devolucion existe o el estado es DEVUELTO."
+        }
+      },
+      "contrato": "valida",
+      "motivo": ""
+    },
+    {
+      "paso": 5,
+      "respuesta": "{\"pensamiento\":\"Aplicaré el guard requerido para que un préstamo ya devuelto no cuente como vencido.\",\"accion\":\"editar_archivo\",\"args\":{\"ruta\":\"src/prestamos/dominio.py\",\"antes\":\"        return fecha_corte > self.fecha_limite\",\"despues\":\"        return (\\n            self.fecha_devolucion is None\\n            and self.estado != EstadoPrestamo.DEVUELTO\\n            and fecha_corte > self.fecha_limite\\n        )\"}}",
+      "decision": {
+        "pensamiento": "Aplicaré el guard requerido para que un préstamo ya devuelto no cuente como vencido.",
+        "accion": "editar_archivo",
+        "args": {
+          "ruta": "src/prestamos/dominio.py",
+          "antes": "        return fecha_corte > self.fecha_limite",
+          "despues": "        return (\n            self.fecha_devolucion is None\n            and self.estado != EstadoPrestamo.DEVUELTO\n            and fecha_corte > self.fecha_limite\n        )"
+        }
+      },
+      "contrato": "valida",
+      "motivo": ""
+    },
+    {
+      "paso": 6,
+      "respuesta": "{\"pensamiento\":\"Volveré a ejecutar la prueba del ISSUE-03 para verificar el arreglo.\",\"accion\":\"ejecutar_pruebas\",\"args\":{\"ruta\":\"tests/test_issue_03_prestamos.py\"}}",
+      "decision": {
+        "pensamiento": "Volveré a ejecutar la prueba del ISSUE-03 para verificar el arreglo.",
+        "accion": "ejecutar_pruebas",
+        "args": {
+          "ruta": "tests/test_issue_03_prestamos.py"
+        }
+      },
+      "contrato": "valida",
+      "motivo": ""
+    },
+    {
+      "paso": 7,
+      "respuesta": "{\"pensamiento\":\"Comprobaré el diff de la implementación para verificar que el cambio es acotado.\",\"accion\":\"ver_cambios\",\"args\":{\"ruta\":\"src/prestamos/dominio.py\"}}",
+      "decision": {
+        "pensamiento": "Comprobaré el diff de la implementación para verificar que el cambio es acotado.",
+        "accion": "ver_cambios",
+        "args": {
+          "ruta": "src/prestamos/dominio.py"
+        }
+      },
+      "contrato": "valida",
+      "motivo": ""
+    },
+    {
+      "paso": 8,
+      "respuesta": "{\"pensamiento\":\"Leeré la nota persistente para confirmar que quedó guardada y recuperable.\",\"accion\":\"leer_notas\",\"args\":{}}",
+      "decision": {
+        "pensamiento": "Leeré la nota persistente para confirmar que quedó guardada y recuperable.",
+        "accion": "leer_notas",
+        "args": {}
+      },
+      "contrato": "valida",
+      "motivo": ""
+    },
+    {
+      "paso": 9,
+      "respuesta": "{\"pensamiento\":\"La prueba del issue pasa, la memoria conserva la hipótesis y los archivos revisados. Termino con el resumen.\",\"final\":\"ISSUE-03 corregido: un préstamo con fecha de devolución o estado DEVUELTO ya no se marca vencido. La prueba específica pasa; el cambio se limita a Prestamo.esta_vencido.\"}",
+      "decision": {
+        "pensamiento": "La prueba del issue pasa, la memoria conserva la hipótesis y los archivos revisados. Termino con el resumen.",
+        "final": "ISSUE-03 corregido: un préstamo con fecha de devolución o estado DEVUELTO ya no se marca vencido. La prueba específica pasa; el cambio se limita a Prestamo.esta_vencido."
+      },
+      "contrato": "valida",
+      "motivo": ""
+    }
+  ],
+  "contexto_final_caracteres": 10686
+}

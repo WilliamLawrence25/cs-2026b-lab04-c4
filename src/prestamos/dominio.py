@@ -90,8 +90,11 @@ class Prestamo:
         self.estado = EstadoPrestamo.CON_MULTA
 
     def esta_vencido(self, fecha_corte: datetime) -> bool:
-        # BUG ISSUE-03: ignora si el prestamo ya fue devuelto
-        return fecha_corte > self.fecha_limite
+        return (
+            self.fecha_devolucion is None
+            and self.estado != EstadoPrestamo.DEVUELTO
+            and fecha_corte > self.fecha_limite
+        )
 
 class ValidadorMatricula(ABC):
     @abstractmethod
